@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans
+    						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+							http://www.springframework.org/schema/context
+    						http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    						http://www.springframework.org/schema/tx
+        					http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- Views -->
+
+	<bean id="mainFrame" class="imagemanager.gui.MainFrame"
+		init-method="initializeView">
+		<property name="imageCollectionView">
+			<ref bean="imageCollectionView" />
+		</property>
+		<property name="imageLookup">
+			<ref bean="imageLookup" />
+		</property>
+		<property name="imageController">
+			<ref bean="imageController" />
+		</property>
+		<property name="categoryController">
+			<ref bean="categoryController" />
+		</property>
+	</bean>
+
+	<bean id="imageCollectionView" class="imagemanager.gui.ImageCollectionViewPanel"
+		init-method="initView">
+		<property name="categoriesPanel">
+			<ref bean="categoriesPanel" />
+		</property>
+		<property name="selectedCategoriesPanel">
+			<ref bean="selectedCategoriesPanel" />
+		</property>
+		<property name="thumbnailPanel">
+			<ref bean="thumbnailPanel" />
+		</property>
+	</bean>
+
+	<bean id="categoriesPanel" class="imagemanager.gui.category.CategoryViewPanel">
+		<property name="categoryController">
+			<ref bean="categoryController" />
+		</property>
+		<property name="selectedCategoriesPanel">
+			<ref bean="selectedCategoriesPanel" />
+		</property>
+	</bean>
+
+	<bean id="selectedCategoriesPanel" class="imagemanager.gui.category.SelectedCategoriesPanel">
+		<property name="imageQueryController">
+			<ref bean="imageQueryController" />
+		</property>
+	</bean>
+
+	<bean id="thumbnailPanel" class="imagemanager.gui.image.ThumbnailPanel">
+		<property name="categoryController">
+			<ref bean="categoryController" />
+		</property>
+		<property name="imageController">
+			<ref bean="imageController" />
+		</property>
+	</bean>
+
+	<bean id="imageLookup" class="imagemanager.gui.imagelookup.ImageLookupPanel"
+		init-method="initView">
+		<property name="sourceImageViewComponent">
+			<ref bean="sourceImageViewComponent" />
+		</property>
+	</bean>
+
+	<bean id="sourceImageViewComponent" class="imagemanager.gui.imagelookup.SourceImageViewComponent" init-method="initialize">
+		<property name="imageController">
+			<ref bean="imageController"/>
+		</property>
+	</bean>
+
+	<!-- Controllers -->
+	<bean id="imageController" class="imagemanager.controller.ImageController">
+		<property name="imageRepo">
+			<ref bean="imageRepo" />
+		</property>
+		<property name="imageLookup">
+			<ref bean="imageLookup" />
+		</property>
+	</bean>
+
+	<bean id="categoryController" class="imagemanager.controller.CategoryController"
+		init-method="initializeViews">
+		<property name="categoryRepo">
+			<ref bean="categoryRepo" />
+		</property>
+		<property name="imageRepo">
+			<ref bean="imageRepo" />
+		</property>
+		<property name="categoryView">
+			<ref bean="categoriesPanel" />
+		</property>
+		<property name="thumbnailPanel">
+			<ref bean="thumbnailPanel" />
+		</property>
+	</bean>
+
+	<bean id="imageQueryController" class="imagemanager.controller.ImageQueryController">
+		<property name="selectedCategoriesPanel">
+			<ref bean="selectedCategoriesPanel" />
+		</property>
+		<property name="categoryRepo">
+			<ref bean="categoryRepo" />
+		</property>
+		<property name="imageRepo">
+			<ref bean="imageRepo" />
+		</property>
+		<property name="thumbnailPanel">
+			<ref bean="thumbnailPanel" />
+		</property>
+	</bean>
+	<!-- Model -->
+
+	<!-- Persistence configuration -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="image-manager" />
+	</bean>
+
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<tx:annotation-driven />
+	<bean id="categoryRepo" class="imagemanager.persistence.jpa.CategoryRepositoryJPA" />
+	<bean id="imageRepo" class="imagemanager.persistence.jpa.ImageRepositoryJPA" />
+	<bean id="testEntityRepo" class="imagemanager.persistence.jpa.TestEntityRepositoryJPA" />
+</beans>
