@@ -113,7 +113,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		return point;
 	}
 
-	public Polygon getSelectedQuadrangle() throws QuadrangleIncompleteException{
+	public Point[] getSelectedQuadrangle() throws QuadrangleIncompleteException{
 			QuadrangleSelecting quad = (QuadrangleSelecting) drawables.get("boardSelection");
 			return quad.getSelectedQuadrangle();
 	}
@@ -160,7 +160,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 				if (mode == Mode.MANUAL_BOARD_SELECTION) {
 					try {
 	
-						Polygon quadrangle = getSelectedQuadrangle();
+						Point[] quadrangle = getSelectedQuadrangle();
 						imageController.createBoardRegion(quadrangle);
 						drawables.remove("boardSelection");
 						repaint();

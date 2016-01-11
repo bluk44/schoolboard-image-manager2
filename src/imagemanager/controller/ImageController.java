@@ -1,11 +1,10 @@
 package imagemanager.controller;
 
 import imagemanager.gui.imagelookup.ImageLookupPanel;
-import imagemanager.gui.imagelookup.SourceImageViewComponent;
 import imagemanager.model.SourceImage;
 import imagemanager.persistence.ImageRepository;
 
-import java.awt.Polygon;
+import java.awt.Point;
 
 public class ImageController {
 
@@ -16,8 +15,10 @@ public class ImageController {
 		
 	}
 	
-	public void createBoardRegion(Polygon quadrangle){
+	public void createBoardRegion(Point[] quadrangle){
 		System.out.println("updating model...");
+		SourceImage source = imageLookup.getSourceImage();
+		
 		System.out.println("updating view...");
 	}
 	

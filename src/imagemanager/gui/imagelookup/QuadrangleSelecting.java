@@ -14,7 +14,7 @@ public class QuadrangleSelecting extends DrawableObject{
 	
 	AffineTransform at = new AffineTransform();
 	
-	public Polygon getSelectedQuadrangle() throws QuadrangleIncompleteException{
+	public Point[] getSelectedQuadrangle() throws QuadrangleIncompleteException{
 		if(quadrangle.size() < 4) throw new QuadrangleIncompleteException();		
 		else {
 			// znajdz srodek ciezkosci
@@ -40,12 +40,7 @@ public class QuadrangleSelecting extends DrawableObject{
 				}
 			}
 			
-			Polygon poly = new Polygon();
-			for (Point point : pts) {
-				poly.addPoint(point.x, point.y);
-			}
-			
-			return poly;
+			return pts;
 		}
 		
 	}
