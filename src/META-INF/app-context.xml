@@ -136,5 +136,4 @@
 	<tx:annotation-driven />
 	<bean id="categoryRepo" class="imagemanager.persistence.jpa.CategoryRepositoryJPA" />
 	<bean id="imageRepo" class="imagemanager.persistence.jpa.ImageRepositoryJPA" />
-	<bean id="testEntityRepo" class="imagemanager.persistence.jpa.TestEntityRepositoryJPA" />
 </beans>
