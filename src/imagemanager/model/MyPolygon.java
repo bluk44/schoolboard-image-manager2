@@ -16,4 +16,14 @@ public class MyPolygon extends LinkedHashSet<Point>{
 		return poly;
 	}
 	
+	@Override
+	public String toString() {
+		String pointString = "[";
+		for (Point point : this) {
+			pointString = pointString + "("+point.x+","+point.y+")";
+		}
+		pointString+="]";
+		
+		return pointString;
+	}
 }
