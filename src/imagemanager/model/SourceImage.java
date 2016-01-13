@@ -172,9 +172,8 @@ public class SourceImage {
 		BoardRegion boardRegion = new BoardRegion();
 		boardRegion.setPixels(Util.getByteArray(clipped));
 		boardRegion.setPerimeter(new MyQuadrangle(quadrangle));
-		boardRegion.setId(12345l);
-		this.getBoardImages().add(boardRegion);
-		
+		boardImages.add(boardRegion);
+		boardRegion.setSourceImage(this);
 		Test.showImage(clipped, "clipped");
 		
 	}

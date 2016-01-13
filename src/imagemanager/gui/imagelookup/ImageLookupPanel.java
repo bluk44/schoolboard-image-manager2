@@ -56,9 +56,11 @@ public class ImageLookupPanel extends JPanel {
 	}
 
 	private void updateView() {
+		System.out.println("updateView called");
 		BufferedImage image = Util.getBufferedImage(sourceImage.getPixels());
 		sourceImageViewComponent.setImage(image);
 		Set<BoardRegion> breg = sourceImage.getBoardImages();
+		System.out.println("board regions size "+breg.size());
 		for (BoardRegion boardRegion : breg) {
 			sourceImageViewComponent.putPolygon("BR" + boardRegion.getId(),
 					boardRegion.getPerimeter().toAWTPolygon());

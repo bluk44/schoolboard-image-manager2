@@ -22,11 +22,12 @@ public class ImageController {
 	}
 	
 	public void createBoardRegion(Point[] quadrangle){
-		System.out.println("updating model...");
 		SourceImage source = imageLookup.getSourceImage();
 		source.extractBoardRegion(quadrangle);
 		
-		System.out.println("updating view...");
+		source = imageRepo.saveImage(source);
+		imageLookup.setSourceImage(source);
+		
 		updateSourceImageView();
 	}
 	
