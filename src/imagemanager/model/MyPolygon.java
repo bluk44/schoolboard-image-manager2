@@ -5,6 +5,12 @@ import java.util.LinkedHashSet;
 
 public class MyPolygon extends LinkedHashSet<Point>{
 	
+	public MyPolygon(Point[] points){
+		for (Point point : points) {
+			this.add(new Point(point));
+		}
+	}
+	
 	public java.awt.Polygon toAWTPolygon(){
 		
 		java.awt.Polygon poly = new java.awt.Polygon();

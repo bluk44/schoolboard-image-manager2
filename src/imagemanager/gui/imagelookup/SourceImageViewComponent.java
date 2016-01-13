@@ -1,6 +1,8 @@
 package imagemanager.gui.imagelookup;
 
 import imagemanager.controller.ImageController;
+import imagemanager.model.SourceImage;
+import imageprocessing.Util;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -11,8 +13,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -44,6 +48,32 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		setupPopupMenu();
 	}
 
+	public void putBoardRegionQuadranle(Long id, LinkedHashSet<Point> points){
+		Polygon poly = new Polygon();
+		for (Point point : points) {
+			poly.addPoint(point.x, point.y);
+
+		}
+		drawables.put("BR"+id, new DrawableShape(poly));
+
+	}
+
+	public void removeBoardregionQuadrangle(Long id){
+		drawables.remove("BR"+id);
+	}
+
+	public Collection<Long> getRegionKeys(){
+		Collection<Long> regionKeys = new ArrayList<Long>();
+		Collection<String> allkeys = drawables.keySet();
+		for (String key : allkeys) {
+			if(key.startsWith("BR")){
+				regionKeys.add(new Long(key.substring(2)));
+			}
+
+		}
+		return regionKeys;
+	}
+	
 	public void setMode(Mode mode) {
 		this.mode = mode;
 		switch (mode) {
@@ -55,6 +85,11 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		}
 	}
 	
+	public void setSourceImage(SourceImage source){
+		BufferedImage image = Util.getBufferedImage(source.getPixels());
+		setImage(image);
+	}
+	
 	public ImageController getImageController() {
 		return imageController;
 	}
@@ -62,19 +97,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	public void setImageController(ImageController imageController) {
 		this.imageController =  imageController;
 	}
-		
-	protected Collection<String> getRegionKeys(){
-		Collection<String> regionKeys = new LinkedList<String>();
-		Collection<String> allkeys = drawables.keySet();
-		for (String key : allkeys) {
-			if(key.startsWith("BR")){
-				regionKeys.add(key);
-			}
-		}
-		
-		return regionKeys;
-	}
-	
+				
 	@Override
 	protected void drawObjects(Graphics2D g2d) {
 		drawImage(g2d);
@@ -113,7 +136,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		return point;
 	}
 
-	public Point[] getSelectedQuadrangle() throws QuadrangleIncompleteException{
+	private Point[] getSelectedQuadrangle() throws QuadrangleIncompleteException{
 			QuadrangleSelecting quad = (QuadrangleSelecting) drawables.get("boardSelection");
 			return quad.getSelectedQuadrangle();
 	}
@@ -162,8 +185,6 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	
 						Point[] quadrangle = getSelectedQuadrangle();
 						imageController.createBoardRegion(quadrangle);
-						drawables.remove("boardSelection");
-						repaint();
 						
 					} catch (QuadrangleIncompleteException e1) {
 						System.out.println(e1.getMessage());
@@ -198,10 +219,10 @@ public class SourceImageViewComponent extends ImageViewComponent {
 				if (mode == Mode.DISPLAY) {
 
 					// wywolaj menu kontekstowe
-					Collection<String> regionKeys = getRegionKeys();
+					Collection<Long> regionKeys = getRegionKeys();
 					openRegionSubmenu.removeAll();
-					for (String string : regionKeys) {
-						openRegionSubmenu.add(new JMenuItem(string));
+					for (Long id : regionKeys) {
+						openRegionSubmenu.add(new JMenuItem(id.toString()));
 					}
 					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 

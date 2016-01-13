@@ -25,10 +25,10 @@ public class ImageLookupPanel extends JPanel {
 	private JSplitPane splitPane = new JSplitPane();
 	private SourceImageViewComponent sourceImageViewComponent;
 
-	ImageLookupPanel() {
+	public ImageLookupPanel() {
 	}
 
-	public void initView() {
+	public void initialize() {
 		
 		sourceImageViewComponent.setPreferredSize(new Dimension(400, 400));
 		splitPane.setLeftComponent(sourceImageViewComponent);

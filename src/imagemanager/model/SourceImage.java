@@ -125,6 +125,7 @@ public class SourceImage {
 	}
 
 	public void extractBoardRegion(Point[] quadrangle) {
+		
 		BufferedImage image = Util.getBufferedImage(this.pixels);
 
 		ImageProcessor ip1 = Util.convertToImageProcessor(image);
@@ -134,7 +135,7 @@ public class SourceImage {
 		int y1 = (quadrangle[0].y + quadrangle[1].y) / 2;
 		int x2 = (quadrangle[1].x + quadrangle[2].x) / 2;
 		int y2 = (quadrangle[2].y + quadrangle[3].y) / 2;
-
+		
 		Point[] fixed = new Point[4];
 
 		fixed[0] = new Point(x1, y1);
@@ -144,12 +145,6 @@ public class SourceImage {
 
 		ArrayList<PointMatch> m = new ArrayList<PointMatch>();
 
-		// for (int i = 0; i < 4; i++) {
-		// m.add(new PointMatch(new Point(new float[] { distorted.get(i).x,
-		// distorted.get(i).y }), new Point(new float[] {
-		// fixed.get(i).x, fixed.get(i).y })));
-		//
-		// }
 		for (int i = 0; i < 4; i++) {
 			m.add(new PointMatch(new mpicbg.models.Point(new float[] {
 					quadrangle[i].x, quadrangle[i].y }),
@@ -164,7 +159,6 @@ public class SourceImage {
 		try {
 			model.fit(m);
 			mapping.mapInterpolated(ip1, ip2);
-			Test.showImage(ip2.getBufferedImage(), "ip2");
 
 		} catch (NotEnoughDataPointsException e) {
 			// TODO Auto-generated catch block
@@ -173,6 +167,15 @@ public class SourceImage {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		BufferedImage clipped = Util.subImage(ip2.getBufferedImage(), x1, y1, x2, y2);
+		BoardRegion boardRegion = new BoardRegion();
+		boardRegion.setPixels(Util.getByteArray(clipped));
+		boardRegion.setPerimeter(new MyQuadrangle(quadrangle));
+		boardRegion.setId(12345l);
+		this.getBoardImages().add(boardRegion);
+		
+		Test.showImage(clipped, "clipped");
 		
 	}
 

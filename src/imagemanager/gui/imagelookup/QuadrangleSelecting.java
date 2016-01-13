@@ -29,14 +29,14 @@ public class QuadrangleSelecting extends DrawableObject{
 			// nadaj kolejnosc punktom aby tworzyly prostokat
 			Point[] pts = new Point[4];
 			for (Point point : quadrangle) {
-				if(point.x > b.x && point.y > b.y){
-					pts[0] = new Point(point.x, point.y);
-				} else if(point.x < b.x && point.y < b.y){
-					pts[2] = new Point(point.x, point.y);
+				if(point.x < b.x && point.y < b.y){
+					pts[0] = new Point(point);
 				} else if(point.x > b.x && point.y < b.y){
-					pts[1] = new Point(point.x, point.y);
-				} else {
-					pts[3] = new Point(point.x, point.y);
+					pts[1] = new Point(point);
+				} else if(point.x > b.x && point.y > b.y){
+					pts[2] = new Point(point);
+				} else if(point.x < b.x && point.y > b.y){
+					pts[3] = new Point(point);
 				}
 			}
 			
