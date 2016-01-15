@@ -70,6 +70,9 @@
 		<property name="sourceImageViewComponent">
 			<ref bean="sourceImageViewComponent" />
 		</property>
+		<property name="boardRegionsPane">
+			<ref bean="boardRegionsPane"/>
+		</property>
 	</bean>
 
 	<bean id="sourceImageViewComponent" class="imagemanager.gui.imagelookup.SourceImageViewComponent" init-method="initialize">
@@ -77,7 +80,10 @@
 			<ref bean="imageController"/>
 		</property>
 	</bean>
-
+	
+	<bean id="boardRegionsPane" class="imagemanager.gui.imagelookup.BoardRegionsPane">
+	</bean>
+	
 	<!-- Controllers -->
 	<bean id="imageController" class="imagemanager.controller.ImageController">
 		<property name="imageRepo">

@@ -21,6 +21,21 @@ public class ImageController {
 		
 	}
 	
+	public void openBoardRegion(Long id){
+		System.out.println("opening region "+id);
+		SourceImage source = imageLookup.getSourceImage();
+		Set<BoardRegion> regions = source.getBoardImages();
+		System.out.println("number of regions "+regions.size());
+		for (BoardRegion region : regions) {
+			System.out.println(region.getId());
+			if(region.getId().equals(id)){
+				System.out.println("region found");
+				imageLookup.getBoardRegionsPane().openBoardRegion(region);
+				break;
+			}
+		}
+	}
+	
 	public void createBoardRegion(Point[] quadrangle){
 		SourceImage source = imageLookup.getSourceImage();
 		source.extractBoardRegion(quadrangle);

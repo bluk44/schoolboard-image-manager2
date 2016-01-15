@@ -1,5 +1,6 @@
 package imagemanager.gui.imagelookup;
 
+import fiji.plugin.trackmate.gui.ActionListenablePanel;
 import imagemanager.controller.ImageController;
 import imagemanager.model.SourceImage;
 import imageprocessing.Util;
@@ -7,6 +8,8 @@ import imageprocessing.Util;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -97,7 +100,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	public void setImageController(ImageController imageController) {
 		this.imageController =  imageController;
 	}
-				
+	
 	@Override
 	protected void drawObjects(Graphics2D g2d) {
 		drawImage(g2d);
@@ -221,8 +224,11 @@ public class SourceImageViewComponent extends ImageViewComponent {
 					// wywolaj menu kontekstowe
 					Collection<Long> regionKeys = getRegionKeys();
 					openRegionSubmenu.removeAll();
+					OpenRegionActionListener listener = new OpenRegionActionListener();
 					for (Long id : regionKeys) {
-						openRegionSubmenu.add(new JMenuItem(id.toString()));
+						JMenuItem openRegionMenuItem = new JMenuItem(id.toString()); 
+						openRegionMenuItem.addActionListener(listener);
+						openRegionSubmenu.add(openRegionMenuItem);
 					}
 					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 
@@ -245,5 +251,14 @@ public class SourceImageViewComponent extends ImageViewComponent {
 			}
 		}
 	}
+	
+	class OpenRegionActionListener implements ActionListener{
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Long id = new Long(((JMenuItem)e.getSource()).getText());
+			imageController.openBoardRegion(id);
+		}
+		
+	}
 }

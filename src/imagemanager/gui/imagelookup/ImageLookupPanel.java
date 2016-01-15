@@ -24,7 +24,8 @@ public class ImageLookupPanel extends JPanel {
 
 	private JSplitPane splitPane = new JSplitPane();
 	private SourceImageViewComponent sourceImageViewComponent;
-
+	private BoardRegionsPane boardRegionsPane;
+		
 	public ImageLookupPanel() {
 	}
 
@@ -32,6 +33,7 @@ public class ImageLookupPanel extends JPanel {
 		
 		sourceImageViewComponent.setPreferredSize(new Dimension(400, 400));
 		splitPane.setLeftComponent(sourceImageViewComponent);
+		splitPane.setRightComponent(boardRegionsPane);
 		splitPane.setOneTouchExpandable(true);
 		this.setLayout(new BorderLayout());
 		this.add(splitPane);
@@ -53,6 +55,14 @@ public class ImageLookupPanel extends JPanel {
 	public void setSourceImage(SourceImage sourceImage) {
 		this.sourceImage = sourceImage;
 		updateView();
+	}
+
+	public BoardRegionsPane getBoardRegionsPane() {
+		return boardRegionsPane;
+	}
+
+	public void setBoardRegionsPane(BoardRegionsPane boardRegionsPane) {
+		this.boardRegionsPane = boardRegionsPane;
 	}
 
 	private void updateView() {

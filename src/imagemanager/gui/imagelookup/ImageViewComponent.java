@@ -166,6 +166,7 @@ public class ImageViewComponent extends JComponent {
 
 		@Override
 		public void componentResized(ComponentEvent e) {
+			System.out.println("component resized "+getSize());
 			super.componentResized(e);
 			if (imageInCenter) {
 				setToInitialPosition();
@@ -178,6 +179,7 @@ public class ImageViewComponent extends JComponent {
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
+			System.out.println("key pressed");
 			super.keyPressed(e);
 			if(noImage) return;
 			if(e.getKeyCode() == e.VK_LEFT){
