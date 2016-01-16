@@ -41,14 +41,15 @@ public class ImageController {
 		source.extractBoardRegion(quadrangle);
 		
 		source = imageRepo.saveImage(source);
-		imageLookup.setSourceImage(source);
 		
-		updateSourceImageView();
+		updateSourceImageView(source);
 	}
+
 	
 	public void setupImageView(String imageName) {
-		SourceImage image = imageRepo.findImage(imageName);
-		imageLookup.setSourceImage(image);
+		SourceImage source = imageRepo.findImage(imageName);
+		
+		updateSourceImageView(source);
 	}
 
 	public ImageRepository getImageRepo() {
@@ -67,7 +68,9 @@ public class ImageController {
 		this.imageLookup = imageLookup;
 	}
 	
-	private void updateSourceImageView(){
+	private void updateSourceImageView(SourceImage source){
+		imageLookup.setSourceImage(source);
+
 		SourceImageViewComponent view = imageLookup.getSourceImageViewComponent();
 		
 		Collection<Long> brKeys = view.getRegionKeys();
@@ -81,6 +84,7 @@ public class ImageController {
 			view.putBoardRegionQuadranle(boardRegion.getId(), boardRegion.getPerimeter());
 		}
 		view.setMode(Mode.DISPLAY);
+		view.fitImageToComponent();
 		view.repaint();
 	}
 }

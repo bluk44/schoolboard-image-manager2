@@ -55,6 +55,7 @@ public class ImageViewComponent extends JComponent {
 		this.noImage = true;
 		setToInitialPosition();
 	}
+	
 	public void putPolygon(String name, Polygon poly) {
 
 		drawables.put(name, new DrawableShape(poly));

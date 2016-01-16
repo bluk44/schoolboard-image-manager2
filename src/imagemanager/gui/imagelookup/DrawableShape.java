@@ -8,7 +8,7 @@ import java.awt.Shape;
 public class DrawableShape extends DrawableObject {
 	
 	protected Shape shape;
-	protected Color color = Color.GREEN;
+	protected Color color = Color.BLUE;
 	
 	public DrawableShape(Shape shape) {
 		this.shape = shape;

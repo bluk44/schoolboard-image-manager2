@@ -57,7 +57,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 			poly.addPoint(point.x, point.y);
 
 		}
-		drawables.put("BR"+id, new DrawableShape(poly));
+		drawables.put("BR"+id, new DrawableBoardQuadrangle(poly, id));
 
 	}
 

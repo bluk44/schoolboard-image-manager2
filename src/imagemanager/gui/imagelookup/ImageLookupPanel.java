@@ -25,12 +25,12 @@ public class ImageLookupPanel extends JPanel {
 	private JSplitPane splitPane = new JSplitPane();
 	private SourceImageViewComponent sourceImageViewComponent;
 	private BoardRegionsPane boardRegionsPane;
-		
+
 	public ImageLookupPanel() {
 	}
 
 	public void initialize() {
-		
+
 		sourceImageViewComponent.setPreferredSize(new Dimension(400, 400));
 		splitPane.setLeftComponent(sourceImageViewComponent);
 		splitPane.setRightComponent(boardRegionsPane);
@@ -54,7 +54,9 @@ public class ImageLookupPanel extends JPanel {
 
 	public void setSourceImage(SourceImage sourceImage) {
 		this.sourceImage = sourceImage;
-		updateView();
+		sourceImageViewComponent.setImage(Util.getBufferedImage(sourceImage
+				.getPixels()));
+
 	}
 
 	public BoardRegionsPane getBoardRegionsPane() {
@@ -65,18 +67,4 @@ public class ImageLookupPanel extends JPanel {
 		this.boardRegionsPane = boardRegionsPane;
 	}
 
-	private void updateView() {
-		System.out.println("updateView called");
-		BufferedImage image = Util.getBufferedImage(sourceImage.getPixels());
-		sourceImageViewComponent.setImage(image);
-		Set<BoardRegion> breg = sourceImage.getBoardImages();
-		System.out.println("board regions size "+breg.size());
-		for (BoardRegion boardRegion : breg) {
-			sourceImageViewComponent.putPolygon("BR" + boardRegion.getId(),
-					boardRegion.getPerimeter().toAWTPolygon());
-		}
-		sourceImageViewComponent.fitImageToComponent();
-		sourceImageViewComponent.repaint();
-
-	}
 }
