@@ -2,7 +2,9 @@ package imagemanager.model;
 
 import ij.process.ImageProcessor;
 import imageprocessing.Util;
+import imageprocessing.segmentation.BackgroundCleaner;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,12 +24,12 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
-import test.Test;
 import mpicbg.ij.InverseTransformMapping;
 import mpicbg.models.HomographyModel2D;
 import mpicbg.models.IllDefinedDataPointsException;
 import mpicbg.models.NotEnoughDataPointsException;
 import mpicbg.models.PointMatch;
+import test.Test;
 
 @Entity
 @Table(name = "SOURCEIMAGE", uniqueConstraints = { @UniqueConstraint(columnNames = { "NAME" }) })
@@ -169,8 +171,13 @@ public class SourceImage {
 		}
 		
 		BufferedImage clipped = Util.subImage(ip2.getBufferedImage(), x1, y1, x2, y2);
+		
+		// czyszczenie tla
+		Color[] colors = new Color[2];
+		BufferedImage binarized = BackgroundCleaner.run(clipped, colors);
+		
 		BoardRegion boardRegion = new BoardRegion();
-		boardRegion.setPixels(Util.getByteArray(clipped));
+		boardRegion.setPixels(Util.getByteArray(binarized));
 		boardRegion.setPerimeter(new MyQuadrangle(quadrangle));
 		boardImages.add(boardRegion);
 		boardRegion.setSourceImage(this);

@@ -3,11 +3,13 @@ package imageprocessing;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
+import imageprocessing.matrix.MatrixI;
 
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -221,18 +223,18 @@ public abstract class Util {
 		return ip;
 	}
 
-//	public static MatrixI grayToMatrixI(BufferedImage grayscaleImg) {
-//		MatrixI matrix = new MatrixI(grayscaleImg.getWidth(),
-//				grayscaleImg.getHeight());
-//		int sizeX = grayscaleImg.getWidth(), sizeY = grayscaleImg.getHeight();
-//		Raster r = grayscaleImg.getRaster();
-//		for (int i = 0; i < sizeY; i++) {
-//			for (int j = 0; j < sizeX; j++) {
-//				matrix.setElement(j, i, r.getSample(j, i, 0));
-//			}
-//		}
-//		return matrix;
-//	}
+	public static MatrixI grayToMatrixI(BufferedImage grayscaleImg) {
+		MatrixI matrix = new MatrixI(grayscaleImg.getWidth(),
+				grayscaleImg.getHeight());
+		int sizeX = grayscaleImg.getWidth(), sizeY = grayscaleImg.getHeight();
+		Raster r = grayscaleImg.getRaster();
+		for (int i = 0; i < sizeY; i++) {
+			for (int j = 0; j < sizeX; j++) {
+				matrix.setElement(j, i, r.getSample(j, i, 0));
+			}
+		}
+		return matrix;
+	}
 
 //	public static MatrixB grayToMatrixB(BufferedImage grayscaleImg,
 //			int threshold) {

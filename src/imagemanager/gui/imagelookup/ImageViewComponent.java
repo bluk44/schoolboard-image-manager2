@@ -65,6 +65,7 @@ public class ImageViewComponent extends JComponent {
 	/**
 	 * Ustawia skale d aby zdjecie miescilo sie w komponencie
 	 */
+	
 	public void fitImageToComponent() {
 		DrawableImage img = (DrawableImage) drawables.get("image");
 		double imgW = img.getWidth(), imgH = img.getHeight();
@@ -167,7 +168,6 @@ public class ImageViewComponent extends JComponent {
 
 		@Override
 		public void componentResized(ComponentEvent e) {
-			System.out.println("component resized "+getSize());
 			super.componentResized(e);
 			if (imageInCenter) {
 				setToInitialPosition();
