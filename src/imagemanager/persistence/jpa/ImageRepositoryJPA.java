@@ -1,5 +1,6 @@
 package imagemanager.persistence.jpa;
 
+import imagemanager.model.BoardRegion;
 import imagemanager.model.SourceImage;
 import imagemanager.persistence.ImageRepository;
 
@@ -48,12 +49,6 @@ public class ImageRepositoryJPA implements ImageRepository{
 	}
 
 	@Override
-	public void deleteImage(SourceImage image) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public Collection<SourceImage> loadImagesFromCategories(
 			String... categoryTitles) {
 		Collection<String> titles = new ArrayList<String>();
@@ -66,6 +61,19 @@ public class ImageRepositoryJPA implements ImageRepository{
 						"select s from SourceImage s join s.categories c where c.title in :param1", SourceImage.class)
 				.setParameter("param1", titles).getResultList();
 		return images;
+	}
+
+	@Override
+	public void deleteImage(SourceImage image) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	@Transactional(readOnly=false)
+	public void deleteBoardRegion(BoardRegion region) {
+		BoardRegion merged = em.merge(region);
+		em.remove(merged);
 	}
 	
 }

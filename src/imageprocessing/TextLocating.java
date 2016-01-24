@@ -1,4 +1,4 @@
-package imageprocessing;
+package imageprocessing; 
 
 import imageprocessing.Labeling4.Region;
 
@@ -17,6 +17,8 @@ public class TextLocating {
 	private static int fgColor = Color.WHITE.getRGB();
 	private static int bgColor = Color.BLACK.getRGB();
 
+	public static Color BG = Color.BLACK;
+	
 	private enum dir {
 		N, S, W, E;
 		
@@ -32,9 +34,8 @@ public class TextLocating {
 
 	private static int squareSize = 10;
 
-	public static List<Polygon> findTextPolygons(BufferedImage image,
-			Color bgColor, Color fgColor) {
-
+	public static List<Polygon> findTextPolygons(BufferedImage image) {
+		
 		int nh = (int) Math.round(image.getHeight() / (double) squareSize);
 		int nw = (int) Math.round(image.getWidth() / (double) squareSize);
 
@@ -42,27 +43,29 @@ public class TextLocating {
 		double yScale = (double) (nh * squareSize) / image.getHeight();
 
 		BufferedImage corrected = Util.resize(image, xScale, yScale);
-		BufferedImage textRegionsMap = new BufferedImage(nw, nh,
-				BufferedImage.TYPE_BYTE_GRAY);
-		Color c = new Color(255, 255, 255);
-	
-		int mapx = 0, mapy = 0;
-		for (int i = 0; i < nh * squareSize; i += squareSize) {
-			mapx = 0;
-			for (int j = 0; j < nw * squareSize; j += squareSize) {
-				boolean textDetected = checkForText(i, j, corrected, fgColor);
-				if (textDetected)
-					textRegionsMap.setRGB(mapx, mapy, c.getRGB());
-				++mapx;
-			}
-			++mapy;
-		}
+//		BufferedImage textRegionsMap = new BufferedImage(nw, nh,
+//				BufferedImage.TYPE_BYTE_GRAY);
+//		Color c = new Color(255, 255, 255);
+//	
+//		int mapx = 0, mapy = 0;
+//		for (int i = 0; i < nh * squareSize; i += squareSize) {
+//			mapx = 0;
+//			for (int j = 0; j < nw * squareSize; j += squareSize) {
+//				boolean textDetected = checkForText(i, j, corrected, fgColor);
+//				if (textDetected)
+//					textRegionsMap.setRGB(mapx, mapy, c.getRGB());
+//				++mapx;
+//			}
+//			++mapy;
+//		}
 
+		BufferedImage textRegionsMap = createTextRegionsMap(corrected);
+		
 		fillIsolatedBackground(textRegionsMap);
 		
-		Test.showImage(textRegionsMap, "map");
+		Test.showImage(textRegionsMap, "textRegionsMap");
+		
 		List<Region> regions = Labeling4.run(textRegionsMap);
-		System.out.println("regions found "+regions.size());
 		List<Polygon> polys = new ArrayList<Polygon>(regions.size());
 
 		for (Region region : regions) {
@@ -79,12 +82,33 @@ public class TextLocating {
 		return polys;
 	}
 
-	private static boolean checkForText(int i, int j, BufferedImage image,
-			Color fg) {
+	private static BufferedImage createTextRegionsMap(BufferedImage image){
+		int mapHeight = (int) Math.round(image.getHeight() / (double) squareSize);
+		int mapWidth = (int) Math.round(image.getWidth() / (double) squareSize);
+		BufferedImage textMap = new BufferedImage(mapWidth, mapHeight,
+				BufferedImage.TYPE_BYTE_GRAY);
+		Color fg = new Color(255, 255, 255);
+		
+		int mapx = 0, mapy = 0;
+		for (int i = 0; i < mapHeight * squareSize; i += squareSize) {
+			mapx = 0;
+			for (int j = 0; j < mapWidth * squareSize; j += squareSize) {
+				boolean textDetected = checkForText(i, j, image);
+				if (textDetected)
+					textMap.setRGB(mapx, mapy, fg.getRGB());
+				++mapx;
+			}
+			++mapy;
+		}
+
+		return textMap;
+	}
+	
+	private static boolean checkForText(int i, int j, BufferedImage image) {
 
 		for (int yidx = i; yidx < i + squareSize; yidx++) {
 			for (int xidx = j; xidx < j + squareSize; xidx++) {
-				if (image.getRGB(xidx, yidx) == fg.getRGB()) {
+				if (image.getRGB(xidx, yidx) != BG.getRGB()) {
 					return true;
 				}
 			}
@@ -143,7 +167,10 @@ public class TextLocating {
 		BufferedImage extended = new BufferedImage(image.getWidth() + 2,
 				image.getHeight() + 2, image.getType());
 		extended.getRaster().setRect(1, 1, image.getRaster());
-
+		
+		int fgColor = Color.WHITE.getRGB();
+		int bgColor = Color.BLACK.getRGB();
+		
 		int cc = 0;
 		int startX = 0, startY = 0;
 
@@ -237,10 +264,6 @@ public class TextLocating {
 
 		} while (!next.equals(start));
 		
-		//AffineTransform at = new AffineTransform();
-		//at.setToTranslation(-1, -1);
-		//poly = AWTUtil.copyPolygon(poly, at);
-		//poly.sub(new Point(1, 1));
 		return poly;
 	}
 

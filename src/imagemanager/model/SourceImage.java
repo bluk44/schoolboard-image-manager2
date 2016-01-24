@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -53,7 +54,7 @@ public class SourceImage {
 	@ManyToMany(mappedBy = "images")
 	Set<Category> categories = new HashSet<Category>();
 
-	@OneToMany(mappedBy = "sourceImage")
+	@OneToMany(cascade={CascadeType.ALL}, mappedBy = "sourceImage")
 	Set<BoardRegion> boardImages = new HashSet<BoardRegion>();
 
 	public SourceImage() {

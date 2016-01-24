@@ -1,6 +1,5 @@
 package imagemanager.gui.imagelookup;
 
-import fiji.plugin.trackmate.gui.ActionListenablePanel;
 import imagemanager.controller.ImageController;
 import imagemanager.model.SourceImage;
 import imageprocessing.Util;
@@ -203,9 +202,9 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		public void mouseClicked(MouseEvent e) {
 			System.out.println("mouse clicked");
 			if(noImage) return;
+			
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (mode == Mode.MANUAL_BOARD_SELECTION) {
-					
 					// dodaj wierzcholek regionu tablicy
 					Point onImage = getPointOnImage(new Point(e.getX(),
 							e.getY()));
@@ -224,11 +223,18 @@ public class SourceImageViewComponent extends ImageViewComponent {
 					// wywolaj menu kontekstowe
 					Collection<Long> regionKeys = getRegionKeys();
 					openRegionSubmenu.removeAll();
+					
 					OpenRegionActionListener listener = new OpenRegionActionListener();
+					DeleteRegionActionListener deleteListener = new DeleteRegionActionListener();
+					
 					for (Long id : regionKeys) {
 						JMenuItem openRegionMenuItem = new JMenuItem(id.toString()); 
 						openRegionMenuItem.addActionListener(listener);
 						openRegionSubmenu.add(openRegionMenuItem);
+						
+						JMenuItem deleteRegionMenuItem = new JMenuItem(id.toString());
+						deleteRegionMenuItem.addActionListener(deleteListener);
+						deleteRegionSubmenu.add(deleteRegionMenuItem);
 					}
 					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 
@@ -258,6 +264,16 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		public void actionPerformed(ActionEvent e) {
 			Long id = new Long(((JMenuItem)e.getSource()).getText());
 			imageController.openBoardRegion(id);
+		}
+		
+	}
+	
+	class DeleteRegionActionListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Long id = new Long(((JMenuItem)e.getSource()).getText());
+			imageController.deleteBoardRegion(id);
 		}
 		
 	}

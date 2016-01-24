@@ -26,7 +26,7 @@ public class BoardRegion {
 	@Lob
 	private byte[] pixels;
 	
-	@ManyToOne(cascade={CascadeType.ALL}, fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.LAZY)
 	private SourceImage sourceImage;
 	
 	public BoardRegion(){}
@@ -94,6 +94,11 @@ public class BoardRegion {
 		} else if (!perimeter.equals(other.perimeter))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "BoardRegion [id=" + id + ", perimeter=" + perimeter + "]";
 	}
 
 }
