@@ -27,12 +27,12 @@ import javax.swing.Scrollable;
 public class ThumbnailPanel extends JPanel implements Scrollable {
 	
 	
-	private static Integer thumbSize = 150;
+	private static Integer thumbSize = 175;
 	
 	private boolean selectionKeyPressed;
 
 	private JMenu removeLabelOption = null;
-	private JPopupMenu imagePopupMenu = null;
+	private  JPopupMenu imagePopupMenu = null;
 
 	private CategoryController categoryController;
 	private ImageController imageController;
@@ -42,20 +42,12 @@ public class ThumbnailPanel extends JPanel implements Scrollable {
 		addMouseListener(mouseListener);
 	}
 
-	public List<SourceImageViewObject> getSelection() {
-		List<SourceImageViewObject> selected = new ArrayList<SourceImageViewObject>();
-		Component[] comps = getComponents();
-		for (Component component : comps) {
-			if (((ThumbnailComponent) component).isSelected()) {
-				selected.add(((ThumbnailComponent) component).getImageObject());
-			}
-		}
-		return selected;
-	}
 
-	public void setDisplayableImages(Collection<SourceImageViewObject> images) {
+	public void setDisplayableImages(Collection<ThumbnailComponent> images) {
 		removeAll();
-		addDisplayableImages(images);
+		for (ThumbnailComponent thumbnailComponent2 : images) {
+			add(thumbnailComponent2);
+		}
 		refresh();
 	}
 	
@@ -228,19 +220,19 @@ public class ThumbnailPanel extends JPanel implements Scrollable {
 				
 				// load sourceImage
 				ThumbnailComponent tc = (ThumbnailComponent) e.getSource();
-				imageController.setupImageView(tc.getImageObject().name);
+				imageController.setupImageView(tc.getImageName());
 			}
 
 		}
 		
 	};
 	
-	private void addDisplayableImages(Collection<SourceImageViewObject> images) {
-		for (SourceImageViewObject imageObj : images) {
-			Component comp = new ThumbnailComponent(imageObj);
-			add(comp);
-		}
-	}
+//	private void addDisplayableImages(Collection<ImageIconButton> images) {
+//		for (ImageIconButton imageObj : images) {
+//			Component comp = new ThumbnailComponent2();
+//			add(comp);
+//		}
+//	}
 
 	private void removeDisplayableImages(Collection<SourceImage> images) {
 		int i = 0;
