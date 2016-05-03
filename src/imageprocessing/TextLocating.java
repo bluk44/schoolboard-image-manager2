@@ -17,7 +17,7 @@ public class TextLocating {
 	private static int fgColor = Color.WHITE.getRGB();
 	private static int bgColor = Color.BLACK.getRGB();
 
-	public static Color BG = Color.BLACK;
+	public static Color BG = Color.WHITE;
 	
 	private enum dir {
 		N, S, W, E;
