@@ -7,10 +7,10 @@ import test.Test;
 
 public class LocalAdaptiveThresholding {
 
-	public static void threshold(BufferedImage image, int rad) {
+	public static BufferedImage threshold(BufferedImage image, int rad, double offset) {
 
 		if (image.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-			return;
+			return null;
 		}
 		WritableRaster rast = image.getRaster();
 
@@ -22,7 +22,7 @@ public class LocalAdaptiveThresholding {
 				double s = rast.getSampleDouble(i, j, 0);
 				int[] samples = getSamples(i, j, rad, rast);
 				double avg = getAve(samples);
-				if (s < avg + 0.3 * avg) {
+				if (s < avg + offset * avg) {
 					result.getRaster().setSample(i, j, 0, 0.0);
 				} else {
 					result.getRaster().setSample(i, j, 0, 255.0);
@@ -32,7 +32,7 @@ public class LocalAdaptiveThresholding {
 			}
 		}
 		
-		Test.showImage(result, "result");
+		return result;
 	}
 
 	private static double getAve(int[] tab) {
