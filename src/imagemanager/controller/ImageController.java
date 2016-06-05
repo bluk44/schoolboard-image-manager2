@@ -8,17 +8,25 @@ import imagemanager.model.SourceImage;
 import imagemanager.persistence.ImageRepository;
 
 import java.awt.Point;
+import java.io.File;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.eclipse.persistence.exceptions.DatabaseException;
 
 public class ImageController {
 
 	private ImageRepository imageRepo;
 	protected ImageLookupPanel imageLookup;
 
-	public void createSourceImage() {
-		
+	public void createSourceImage(File f) {
+		System.out.println("create source image called");
+		SourceImage sourceImage = new SourceImage(f);
+		try{
+			imageRepo.saveImage(sourceImage);
+		} catch(Exception e){
+			System.out.println("database extepion writing image "+f.getName());		
+		}
 	}
 	
 	public void openBoardRegion(Long id){

@@ -1,16 +1,21 @@
 package imagemanager.gui.imagelookup;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
 public class DrawableBoardQuadrangle extends DrawableShape {
 
 	String id;
-	Point center;
+	private final Point center;
+	private final Stroke stroke = new BasicStroke(3);
+	private final Font font = new Font(Font.MONOSPACED, Font.PLAIN, 32);
 	
 	public DrawableBoardQuadrangle(Shape shape, Long id){
 		super(shape);
@@ -33,8 +38,15 @@ public class DrawableBoardQuadrangle extends DrawableShape {
 	public void drawObject(Graphics2D g2d) {
 		System.out.println("DrawableBoardQuadrangle draw object called");
 		Color c = g2d.getColor();
+		Stroke s = g2d.getStroke();
+		Font f = g2d.getFont();
+		
 		g2d.setColor(color);
+		g2d.setStroke(stroke);
 		g2d.draw(shape);
+		g2d.setFont(font);
 		g2d.drawString(id, center.x, center.y);
-		g2d.setColor(c);	}
+		g2d.setColor(c);	
+		g2d.setStroke(s);
+	}
 }

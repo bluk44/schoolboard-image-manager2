@@ -58,11 +58,7 @@ public class ImageIconButton extends JToggleButton {
 	
 	@Override
 	protected void paintComponent(Graphics g) {
-		System.out.println("paint called");
-		
-		System.out.println(isSelected());
-		// TODO Auto-generated method stub
-		//super.paintComponent(g);
+
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.clearRect(0, 0, iconAreaSize+2*margin, iconAreaSize+2*margin);
 		if(isSelected()){

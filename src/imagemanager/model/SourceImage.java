@@ -1,19 +1,16 @@
 package imagemanager.model;
 
-import ij.process.ImageProcessor;
 import imageprocessing.Util;
-import imageprocessing.segmentation.BackgroundCleaner;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -21,26 +18,25 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 
-import mpicbg.ij.InverseTransformMapping;
-import mpicbg.models.HomographyModel2D;
-import mpicbg.models.IllDefinedDataPointsException;
-import mpicbg.models.NotEnoughDataPointsException;
-import mpicbg.models.PointMatch;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
 import test.Test;
 
 @Entity
-@Table(name = "SOURCEIMAGE", uniqueConstraints = { @UniqueConstraint(columnNames = { "NAME" }) })
 public class SourceImage {
 	@Transient
-	static float ICON_SCALE = 0.1f;
+	// rozmiar ikony w pikselach
+	static float ICON_SIZE = 160000; 
 
 	@Id
 	@GeneratedValue
 	private Long id;
+	@Column(unique=true)
 	private String name;
 	private Long date;
 
@@ -65,7 +61,10 @@ public class SourceImage {
 		this.name = tab[tab.length - 1];
 		this.date = file.lastModified();
 		BufferedImage pixels = Util.readImageFromFile(file);
-		BufferedImage icon = Util.resize(pixels, ICON_SCALE);
+		float imageSize = pixels.getWidth() * pixels.getHeight();
+		float scale = ICON_SIZE / imageSize;
+		System.out.println("scale "+scale);
+		BufferedImage icon = Util.resize(pixels, scale, scale);
 		this.pixels = Util.getByteArray(pixels);
 		this.icon = Util.getByteArray(icon);
 
@@ -127,13 +126,71 @@ public class SourceImage {
 		this.boardImages = boardImages;
 	}
 
-	public void extractBoardRegion(Point[] quadrangle) {
+//	public void extractBoardRegion(Point[] quadrangle) {
+//		
+//		BufferedImage image = Util.getBufferedImage(this.pixels);
+//		
+//		
+//		ImageProcessor ip1 = Util.convertToImageProcessor(image);
+//		ImageProcessor ip2 = ip1.duplicate();
+//
+//		int x1 = (quadrangle[0].x + quadrangle[3].x) / 2;
+//		int y1 = (quadrangle[0].y + quadrangle[1].y) / 2;
+//		int x2 = (quadrangle[1].x + quadrangle[2].x) / 2;
+//		int y2 = (quadrangle[2].y + quadrangle[3].y) / 2;
+//		
+//		Point[] fixed = new Point[4];
+//
+//		fixed[0] = new Point(x1, y1);
+//		fixed[1] = new Point(x2, y1);
+//		fixed[2] = new Point(x2, y2);
+//		fixed[3] = new Point(x1, y2);
+//
+//		ArrayList<PointMatch> m = new ArrayList<PointMatch>();
+//
+//		for (int i = 0; i < 4; i++) {
+//			m.add(new PointMatch(new mpicbg.models.Point(new float[] {
+//					quadrangle[i].x, quadrangle[i].y }),
+//					new mpicbg.models.Point(new float[] { fixed[i].x,
+//							fixed[i].y })));
+//		}
+//		
+//		HomographyModel2D model = new HomographyModel2D();
+//		InverseTransformMapping<HomographyModel2D> mapping = new InverseTransformMapping<HomographyModel2D>(
+//				model);
+//		
+//		try {
+//			model.fit(m);
+//			mapping.mapInterpolated(ip1, ip2);
+//
+//		} catch (NotEnoughDataPointsException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IllDefinedDataPointsException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		BufferedImage clipped = Util.subImage(ip2.getBufferedImage(), x1, y1, x2, y2);
+//		
+//		// czyszczenie tla
+//		Color[] colors = new Color[2];
+//		BufferedImage binarized = BackgroundCleaner.run(clipped, colors);
+//		
+//		BoardRegion boardRegion = new BoardRegion();
+
+//		boardRegion.setPerimeter(new MyQuadrangle(quadrangle));
+//		boardImages.add(boardRegion);
+//		boardRegion.setSourceImage(this);
+//		Test.showImage(clipped, "clipped");
+//		
+//	}
+
+	public void extractBoardRegion(Point[] quadrangle){
 		
 		BufferedImage image = Util.getBufferedImage(this.pixels);
-
-		ImageProcessor ip1 = Util.convertToImageProcessor(image);
-		ImageProcessor ip2 = ip1.duplicate();
-
+		Mat imageMat = Util.image2Mat(image);
+		
 		int x1 = (quadrangle[0].x + quadrangle[3].x) / 2;
 		int y1 = (quadrangle[0].y + quadrangle[1].y) / 2;
 		int x2 = (quadrangle[1].x + quadrangle[2].x) / 2;
@@ -145,88 +202,36 @@ public class SourceImage {
 		fixed[1] = new Point(x2, y1);
 		fixed[2] = new Point(x2, y2);
 		fixed[3] = new Point(x1, y2);
+		
+		Mat dstImage = new Mat(x2 - x1 - 1, y2 - y1 - 1, imageMat.type());
+		
+		Mat dst = new Mat(4, 2, CvType.CV_32F);
+		dst.put(0, 0, 0);
+		dst.put(0, 1, 0);
+		dst.put(1, 0, x2 - x1 - 1);
+		dst.put(1, 1, 0);
+		dst.put(2, 0, x2 - x1 - 1);
+		dst.put(2, 1, y2 - y1 - 1);
+		dst.put(3, 0, 0);
+		dst.put(3, 1, y2 - y1 - 1);
 
-		ArrayList<PointMatch> m = new ArrayList<PointMatch>();
+		Mat src = new Mat(4, 2, CvType.CV_32F);
+		src.put(0, 0, quadrangle[0].x);
+		src.put(0, 1, quadrangle[0].y);
+		src.put(1, 0, quadrangle[1].x);
+		src.put(1, 1, quadrangle[1].y);
+		src.put(2, 0, quadrangle[2].x);
+		src.put(2, 1, quadrangle[2].y);
+		src.put(3, 0, quadrangle[3].x);
+		src.put(3, 1, quadrangle[3].y);
+		
+		Mat trans = Imgproc.getPerspectiveTransform(src, dst);
+		Imgproc.warpPerspective(imageMat, dstImage, trans, new Size(x2 - x1 - 1, y2 - y1 - 1));
+		Test.showImage(Util.mat2Img(dstImage), "dstimage");
 
-		for (int i = 0; i < 4; i++) {
-			m.add(new PointMatch(new mpicbg.models.Point(new float[] {
-					quadrangle[i].x, quadrangle[i].y }),
-					new mpicbg.models.Point(new float[] { fixed[i].x,
-							fixed[i].y })));
-		}
-		
-		HomographyModel2D model = new HomographyModel2D();
-		InverseTransformMapping<HomographyModel2D> mapping = new InverseTransformMapping<HomographyModel2D>(
-				model);
-		
-		try {
-			model.fit(m);
-			mapping.mapInterpolated(ip1, ip2);
-
-		} catch (NotEnoughDataPointsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllDefinedDataPointsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		BufferedImage clipped = Util.subImage(ip2.getBufferedImage(), x1, y1, x2, y2);
-		
-		// czyszczenie tla
-		Color[] colors = new Color[2];
-		BufferedImage binarized = BackgroundCleaner.run(clipped, colors);
-		
-		BoardRegion boardRegion = new BoardRegion();
-		boardRegion.setPixels(Util.getByteArray(binarized));
-		boardRegion.setPerimeter(new MyQuadrangle(quadrangle));
-		boardImages.add(boardRegion);
-		boardRegion.setSourceImage(this);
-		Test.showImage(clipped, "clipped");
-		
 	}
-
-	// public BoardRegion extractBoardRegion(Polygon quadrangle){
-	//
-	// // extract board region from source image
-	//
-	// double x1 = (quadrangle.getPoint(0).x + quadrangle.getPoint(3).x) / 2;
-	// double x2 = (quadrangle.getPoint(1).x + quadrangle.getPoint(2).x) / 2;
-	//
-	// double y1 = (quadrangle.getPoint(0).y + quadrangle.getPoint(1).y) / 2;
-	// double y2 = (quadrangle.getPoint(2).y + quadrangle.getPoint(3).y) / 2;
-	//
-	// Polygon fixed = new Polygon(new Point(x1, y1), new Point(x2, y1), new
-	// Point(x2, y2), new Point(x1, y2));
-	//
-	// BufferedImage pixels = Util.getBufferedImage(this.pixels);
-	// BufferedImage trans = QuadrangleTransformation.transform(pixels,
-	// quadrangle, fixed);
-	// BufferedImage bRegion = Util.subImage(trans, (int) fixed.getPoint(0).x,
-	// (int) fixed.getPoint(0).y, (int) fixed.getPoint(2).x,
-	// (int) fixed.getPoint(2).y);
-	// Color[] colors = new Color[2];
-	//
-	// BufferedImage binarized = BackgroundCleaner.run(bRegion, colors);
-	//
-	// // create new board image
-	//
-	// BoardRegion bimg = new BoardRegion();
-	//
-	// bimg.setIcon(Util.resize(binarized, ICON_SCALE));
-	// bimg.setPixels(binarized);
-	// bimg.setSource(this);
-	// bimg.setSrcQuadrangle(quadrangle);
-	//
-	// if(colors[1] == Color.BLACK){
-	// bimg.setType(BoardRegion.BoardType.BLACK);
-	// } else if(colors[2] == Color.WHITE){
-	// bimg.setType(BoardRegion.BoardType.WHITE);
-	// }
-	//
-	// return bimg;
-	// }
-
+	
+	
 	@Override
 	public String toString() {
 		return "SourceImage [id=" + id + ", name=" + name + ", date=" + date

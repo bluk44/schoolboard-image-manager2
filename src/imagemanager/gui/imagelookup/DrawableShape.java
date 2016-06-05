@@ -2,7 +2,6 @@ package imagemanager.gui.imagelookup;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-
 import java.awt.Shape;
 
 public class DrawableShape extends DrawableObject {

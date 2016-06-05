@@ -7,8 +7,8 @@
 		<class>imagemanager.model.Category</class>
 		<class>imagemanager.model.SourceImage</class>
 		<class>imagemanager.model.BoardRegion</class>
-		<class>imagemanager.model.TestEntity</class>
-		<class>dataaccess.Employee</class>
+		<class>imagemanager.model.TextRegion</class>
+		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/imagedb" />

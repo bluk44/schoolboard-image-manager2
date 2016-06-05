@@ -1,9 +1,14 @@
 package imagemanager.model;
 
+import imageprocessing.TextLocating;
 import imageprocessing.Util;
 
+import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -12,30 +17,35 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class BoardRegion {
-	
+
 	@Id
 	@GeneratedValue
 	private Long id;
-	
+
 	@Lob
 	private MyQuadrangle perimeter;
-	
+
 	@Lob
 	private byte[] pixels;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	private SourceImage sourceImage;
 	
-	public BoardRegion(){}
+	@OneToMany(cascade={CascadeType.ALL}, mappedBy = "boardRegion")
+	private Collection<TextRegion> textRegions = new ArrayList<TextRegion>();
 	
-	public BoardRegion(File file){
+	public BoardRegion() {
+	}
+
+	public BoardRegion(File file) {
 		BufferedImage pixels = Util.readImageFromFile(file);
 		this.pixels = Util.getByteArray(pixels);
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -43,7 +53,7 @@ public class BoardRegion {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public MyQuadrangle getPerimeter() {
 		return perimeter;
 	}
@@ -51,7 +61,7 @@ public class BoardRegion {
 	public void setPerimeter(MyQuadrangle perimeter) {
 		this.perimeter = perimeter;
 	}
-	
+
 	public SourceImage getSourceImage() {
 		return sourceImage;
 	}
@@ -67,15 +77,32 @@ public class BoardRegion {
 	public void setPixels(byte[] pixels) {
 		this.pixels = pixels;
 	}
+	
+	public Collection<TextRegion> getTextRegions() {
+		return textRegions;
+	}
+
+	public void setTextRegions(Collection<TextRegion> textRegions) {
+		this.textRegions = textRegions;
+	}
+	
+	public void extractTextRegions() {
+		List<Polygon> textPolygons = TextLocating.findTextPolygons(Util
+				.getBufferedImage(pixels));
+		for (Polygon polygon : textPolygons) {
+			TextRegion textRegion = new TextRegion();
+			textRegion.setPerimeter(polygon);
+			textRegion.setBoardRegion(this);
+			textRegions.add(textRegion);
+		}
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((perimeter == null) ? 0 : perimeter
-						.hashCode());
+		result = prime * result
+				+ ((perimeter == null) ? 0 : perimeter.hashCode());
 		return result;
 	}
 

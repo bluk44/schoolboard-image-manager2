@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
@@ -24,6 +25,11 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
+
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
 
 /**
  * klasa z podstawowymi operacjami na zdjeciach
@@ -140,6 +146,10 @@ public abstract class Util {
 
 	}
 
+	public static Mat readFromFileAsMat(String filename) {
+		return Highgui.imread(filename);
+	}
+
 	public static void writeToFile(String filename, String formatName,
 			BufferedImage img) {
 		try {
@@ -205,6 +215,33 @@ public abstract class Util {
 		return null;
 	}
 
+	public static BufferedImage mat2Img(Mat in) {
+		
+		int type;
+		if (in.channels() == 1)
+			type = BufferedImage.TYPE_BYTE_GRAY;
+		else
+			type = BufferedImage.TYPE_3BYTE_BGR;
+
+		BufferedImage out = new BufferedImage(in.width(), in.height(), type);
+
+		byte[] data = ((DataBufferByte) out.getRaster().getDataBuffer())
+				.getData();
+		in.get(0, 0, data);
+		
+		return out;
+	}
+
+	public static Mat image2Mat(BufferedImage image) {
+		
+		Mat mat = new Mat(new Size(image.getWidth(), image.getHeight()), CvType.CV_8UC3);
+		byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer())
+				.getData();
+		mat.put(0, 0, data);
+		
+		return mat;
+	}
+
 	public static ImageProcessor convertToImageProcessor(BufferedImage source) {
 		int numBands = source.getData().getNumBands();
 		ImageProcessor ip = null;
@@ -236,20 +273,20 @@ public abstract class Util {
 		return matrix;
 	}
 
-//	public static MatrixB grayToMatrixB(BufferedImage grayscaleImg,
-//			int threshold) {
-//		MatrixB matrix = new MatrixB(grayscaleImg.getWidth(),
-//				grayscaleImg.getHeight());
-//		int sizeX = grayscaleImg.getWidth(), sizeY = grayscaleImg.getHeight();
-//		Raster r = grayscaleImg.getRaster();
-//		for (int i = 0; i < sizeY; i++) {
-//			for (int j = 0; j < sizeX; j++) {
-//				if (r.getSample(j, i, 0) > threshold)
-//					matrix.setElement(j, i, true);
-//			}
-//		}
-//		return matrix;
-//	}
+	// public static MatrixB grayToMatrixB(BufferedImage grayscaleImg,
+	// int threshold) {
+	// MatrixB matrix = new MatrixB(grayscaleImg.getWidth(),
+	// grayscaleImg.getHeight());
+	// int sizeX = grayscaleImg.getWidth(), sizeY = grayscaleImg.getHeight();
+	// Raster r = grayscaleImg.getRaster();
+	// for (int i = 0; i < sizeY; i++) {
+	// for (int j = 0; j < sizeX; j++) {
+	// if (r.getSample(j, i, 0) > threshold)
+	// matrix.setElement(j, i, true);
+	// }
+	// }
+	// return matrix;
+	// }
 
 	public static void inverse(BufferedImage src) {
 		WritableRaster srcR = src.getRaster();

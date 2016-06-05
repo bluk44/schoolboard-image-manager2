@@ -21,21 +21,19 @@ public class ImageCollectionViewPanel extends JPanel {
 //		JButton comp1 = new JButton();
 //		JButton comp2 = new JButton();
 		JPanel comp1 = new JPanel();
-		JPanel comp2 = new JPanel();
-		JPanel comp3 = new JPanel();
 		
 		//CategoryViewPanel catPanel = new CategoryViewPanel();
 		//JScrollPane sp = new JScrollPane();
 		//sp.setViewportView(catPanel);
 		comp1.setLayout(new GridLayout());
-		comp1.add(sp);
-		sp.setViewportView(categoriesPanel);
-		comp1.setBackground(Color.yellow);
-		comp2.setBackground(Color.black);
-		comp3.setBackground(Color.gray);
+		comp1.add(categoriesScrollPane);
+		categoriesScrollPane.setViewportView(categoriesPanel);
 		comp1.setPreferredSize(new Dimension(200, 150));
-		comp1.setBorder(BorderFactory.createTitledBorder("tits"));
-		comp3.setPreferredSize(new Dimension(200, 250));
+		comp1.setBorder(BorderFactory.createTitledBorder("Kategorie"));
+		
+		thumbnailScrollPane.setViewportView(thumbnailPanel);
+		thumbnailScrollPane.setBorder(BorderFactory.createTitledBorder("Zdjecia"));
+		
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -46,7 +44,7 @@ public class ImageCollectionViewPanel extends JPanel {
 		c.weightx = 1.0;
 		c.weighty = 0.0;
 		c.gridheight = 2;
-		add(thumbnailPanel, c);
+		add(thumbnailScrollPane, c);
 		c.weightx = 0.0;
 		c.gridy = 1;
 		c.gridx = 0;
@@ -77,7 +75,8 @@ public class ImageCollectionViewPanel extends JPanel {
 
 	}
 	
-	public JScrollPane sp = new JScrollPane();
+	public JScrollPane categoriesScrollPane = new JScrollPane();
+	public JScrollPane thumbnailScrollPane = new JScrollPane();
 	public CategoryViewPanel categoriesPanel;
 	public SelectedCategoriesPanel selectedCategoriesPanel;
 	public ThumbnailPanel thumbnailPanel;

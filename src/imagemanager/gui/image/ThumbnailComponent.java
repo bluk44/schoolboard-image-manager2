@@ -30,6 +30,10 @@ public class ThumbnailComponent extends JComponent{
 		iconButton.setSelected(selected);
 	}
 	
+	public boolean isSelected(){
+		return iconButton.isSelected();
+	}
+	
 	public String getImageName(){
 		return label.getText();
 	}

@@ -4,10 +4,13 @@ import imagemanager.controller.CategoryController;
 import imagemanager.controller.ImageController;
 import imagemanager.gui.imagelookup.ImageLookupPanel;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -18,6 +21,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 
 public class MainFrame extends JFrame {
 
@@ -36,7 +40,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		
+
 		tabbedPane.addTab("Kolekcja zdjęć", imageCollectionView);
 		tabbedPane.addTab("Podgląd zdjęcia", imageLookup);
 
@@ -108,6 +112,12 @@ public class MainFrame extends JFrame {
 		categoryMenu.add(createCategoryMenuItem);
 		categoryMenu.add(deleteCategoryMenuItem);
 
+		JMenuItem importImagesMenuItem = new JMenuItem("Zaimportuj zdjęcia");
+		importImagesMenuItem
+				.addActionListener(new ImportImagesActionListener());
+
+		imageMenu.add(importImagesMenuItem);
+
 		topMenuBar = new JMenuBar();
 		topMenuBar.add(imageMenu);
 		topMenuBar.add(categoryMenu);
@@ -153,6 +163,69 @@ public class MainFrame extends JFrame {
 
 	public void setCategoryController(CategoryController categoryController) {
 		this.categoryController = categoryController;
+	}
+
+	class ImportImagesActionListener implements ActionListener {
+
+		JFileChooser fc = new JFileChooser();
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			fc.addChoosableFileFilter(new ImageFilter());
+			int val = fc.showOpenDialog((Component) e.getSource());
+			
+			if (val == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				if (file.isDirectory()) {
+
+					File[] imageFiles = file.listFiles(new ImageFilter());
+					
+					for (File imageFile : imageFiles) {
+						//System.out.println(imageFile.getName());
+						imageController.createSourceImage(imageFile);
+					}
+				}
+			}
+		}
+
+	}
+
+	class ImageFilter extends FileFilter implements  java.io.FileFilter{
+
+		@Override
+		public boolean accept(File f) {
+	
+			String extension = getExtension(f);
+			if (extension != null) {
+				if (extension.equals("tiff") || extension.equals("tif")
+						|| extension.equals("gif") || extension.equals("jpeg")
+						|| extension.equals("jpg") || extension.equals("png")) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			return false;
+		}
+
+		@Override
+		public String getDescription() {
+			return "Image Files";
+		}
+
+		private String getExtension(File f) {
+			String ext = null;
+			String s = f.getName();
+			int i = s.lastIndexOf('.');
+
+			if (i > 0 && i < s.length() - 1) {
+				ext = s.substring(i + 1).toLowerCase();
+			}
+			return ext;
+		}
+
 	}
 
 }

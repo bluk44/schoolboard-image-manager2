@@ -2,7 +2,6 @@ package imagemanager.controller;
 
 import imagemanager.gui.category.CategoryViewObject;
 import imagemanager.gui.category.CategoryViewPanel;
-import imagemanager.gui.image.SourceImageViewObject;
 import imagemanager.gui.image.ThumbnailPanel;
 import imagemanager.model.Category;
 import imagemanager.model.SourceImage;
@@ -63,14 +62,14 @@ public class CategoryController {
 	
 	public void assignImagesToCategories(){
 		Collection<CategoryViewObject> catObjs = categoryView.getSelectedCategories();
-		Collection<SourceImageViewObject> imageObjs = thumbnailPanel.getSelection();
+		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
 		List<Category> categories = new ArrayList<Category>();
 		for (CategoryViewObject catObj : catObjs) {
 			categories.add(categoryRepo.findCategory(catObj.getTitle()));
 		}
 		List<SourceImage> images = new ArrayList<SourceImage>();
-		for (SourceImageViewObject imageObj : imageObjs) {
-			images.add(imageRepo.findImage(imageObj.getName()));
+		for (String name : imageNames) {
+			images.add(imageRepo.findImage(name));
 		}
 		
 		for (Category category : categories) {
@@ -82,24 +81,13 @@ public class CategoryController {
 	}
 	
 	public void unassignCategoryFromImages(String categoryTitle){
-		Collection<SourceImageViewObject> imageObjs = thumbnailPanel.getSelection();
-		String[] imageNames = new String[imageObjs.size()];
-		int i = 0;
-		for (SourceImageViewObject imageObj : imageObjs) {
-			imageNames[i++] = imageObj.getName();
-		}
-		categoryRepo.unassignCategoryFromImages(categoryTitle, imageNames);
+		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
+		categoryRepo.unassignCategoryFromImages(categoryTitle, imageNames.toArray(new String[]{}));
 	}
 	
 	public Collection<String> getCategoryNamesFromSelectedImages(){
-		Collection<SourceImageViewObject> imageObjs = thumbnailPanel.getSelection();
-		Collection<SourceImage> images = new ArrayList<SourceImage>();
-		String[] names = new String[imageObjs.size()];
-		int i = 0;
-		for (SourceImageViewObject imgObj : imageObjs) {
-			names[i++] = imgObj.getName();
-		}
-		Collection<Category> categories = categoryRepo.loadCategoriesFromImages(names);
+		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
+		Collection<Category> categories = categoryRepo.loadCategoriesFromImages(imageNames.toArray(new String[]{}));
 		Collection<String> catTitles = new ArrayList<String>();
 		for (Category category : categories) {
 			catTitles.add(category.getTitle());

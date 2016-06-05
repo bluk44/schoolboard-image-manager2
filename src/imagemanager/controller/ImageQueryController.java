@@ -2,14 +2,11 @@ package imagemanager.controller;
 
 import imagemanager.gui.category.CategoryViewObject;
 import imagemanager.gui.category.SelectedCategoriesPanel;
-import imagemanager.gui.image.SourceImageViewObject;
 import imagemanager.gui.image.ThumbnailPanel;
 import imagemanager.model.SourceImage;
 import imagemanager.persistence.CategoryRepository;
 import imagemanager.persistence.ImageRepository;
-import imageprocessing.Util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class ImageQueryController {
@@ -36,13 +33,7 @@ public class ImageQueryController {
 			images = imageRepo.loadImagesFromCategories(titles);
 		}
 		
-		if(images != null){
-			Collection<SourceImageViewObject> imageViewObjs = new ArrayList<SourceImageViewObject>();
-			for (SourceImage image : images) {
-				imageViewObjs.add(new SourceImageViewObject(Util.getBufferedImage(image.getIcon()), image.getName(), image.getDate()));
-			}
-			thumbnailPanel.setDisplayableImages(imageViewObjs);
-		}
+		thumbnailPanel.setDisplayableImages(images);
 	}
 
 	public CategoryRepository getCategoryRepo() {

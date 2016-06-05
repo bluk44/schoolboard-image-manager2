@@ -1,31 +1,60 @@
 package imagemanager.model;
 
-import java.awt.Point;
+import imageprocessing.AWTUtil;
+
+import java.awt.Polygon;
 import java.io.Serializable;
-import java.util.Set;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 
-public class TextRegion implements Serializable{
-		
-	private String text;
-	private Set<Point> polygon;
-	
-	public String getText() {
-		return text;
+@Entity
+public class TextRegion implements Serializable {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
+	@Lob
+	private Polygon perimeter;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private BoardRegion boardRegion;
+
+	public TextRegion() {
 	}
-	public void setText(String text) {
-		this.text = text;
+
+	public Long getId() {
+		return id;
 	}
-	public Set<Point> getPolygon() {
-		return polygon;
+
+	public void setId(Long id) {
+		this.id = id;
 	}
-	public void setPolygon(Set<Point> polygon) {
-		this.polygon = polygon;
+
+	public Polygon getPerimeter() {
+		return perimeter;
 	}
+
+	public void setPerimeter(Polygon perimeter) {
+		this.perimeter = perimeter;
+	}
+
+	public BoardRegion getBoardRegion() {
+		return boardRegion;
+	}
+
+	public void setBoardRegion(BoardRegion boardRegion) {
+		this.boardRegion = boardRegion;
+	}
+
 	@Override
 	public String toString() {
-		return "TextRegion [text=" + text + ", polygon=" + polygon + "]";
+		return "TextRegion [id=" + id + ", perimeter="
+				+ AWTUtil.polygonToString(perimeter) + "]";
 	}
-	
 }
-
