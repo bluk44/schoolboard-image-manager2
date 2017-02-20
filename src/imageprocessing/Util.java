@@ -31,6 +31,16 @@ import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 
+
+
+
+//import org.opencv.core.CvType;
+//import org.opencv.core.Mat;
+//import org.opencv.core.MatOfInt;
+//import org.opencv.core.Size;
+//import org.opencv.highgui.Highgui;
+//import org.opencv.imgproc.Imgproc;
+
 /**
  * klasa z podstawowymi operacjami na zdjeciach
  * 
@@ -67,7 +77,7 @@ public abstract class Util {
 		scaleOp.filter(src, result);
 
 		return result;
-
+		
 	}
 
 	public static BufferedImage subImage(BufferedImage src, int x1, int y1,
@@ -241,7 +251,55 @@ public abstract class Util {
 		
 		return mat;
 	}
-
+	
+	public static byte[] mat2Byte(Mat mat){
+		byte[] buff = new byte[(int) (mat.total() * mat.channels())];
+		mat.get(0, 0, buff);
+		
+		return buff;
+	}
+	
+	public static Mat getBinaryImage(Mat image){
+				
+		Mat result = new Mat(image.size(), CvType.CV_32SC1);
+		
+		int[] zero = {0};
+		int[] one = {1};
+		for(int i = 0; i < image.height(); i++){
+			for(int j = 0; j < image.width(); j++){
+				double[] data = image.get(i, j);
+				double el = 0;
+				for(int k = 0; k < data.length; k++){
+					el += data[k];
+				}
+				
+				if(el > 0){
+					result.put(i, j, one);
+				} else {
+					result.put(i, j, zero);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public static MatrixI mat2MatrixI(Mat m){
+		MatrixI result = new MatrixI((int)m.size().width, (int)m.size().height);
+		byte[] pixel = new byte[1];
+		
+		for(int j = 0; j < m.size().height; j++){
+			for(int i = 0; i < m.size().width; i++){
+				m.get(j, i, pixel);
+				if(pixel[0] != 0){
+					result.setElement(i, j, 1);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	public static ImageProcessor convertToImageProcessor(BufferedImage source) {
 		int numBands = source.getData().getNumBands();
 		ImageProcessor ip = null;

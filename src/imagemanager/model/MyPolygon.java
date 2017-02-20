@@ -22,6 +22,11 @@ public class MyPolygon extends LinkedHashSet<Point>{
 		return poly;
 	}
 	
+	public Point[] getPoints(){
+		return this.toArray(new Point[] {});
+		
+	}
+	
 	@Override
 	public String toString() {
 		String pointString = "[";

@@ -75,5 +75,18 @@ public class ImageRepositoryJPA implements ImageRepository{
 		BoardRegion merged = em.merge(region);
 		em.remove(merged);
 	}
+
+	@Override
+	public BoardRegion loadBoardRegion(Long id) {
+		return em.find(BoardRegion.class, id);
+
+	}
+
+	@Override
+	public BoardRegion updateBoardRegion(BoardRegion region) {
+		BoardRegion merged = em.merge(region);
+		em.flush();
+		return merged;
+	}
 	
 }

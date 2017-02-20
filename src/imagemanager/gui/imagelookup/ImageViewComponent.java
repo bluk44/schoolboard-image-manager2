@@ -2,7 +2,7 @@ package imagemanager.gui.imagelookup;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
+import java.awt.Shape;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
@@ -26,6 +26,8 @@ public class ImageViewComponent extends JComponent {
 	protected AffineTransform concAT = new AffineTransform();
 	
 	protected boolean noImage = true;
+	
+	protected boolean keyboardEnabled = true;
 	
 	public ImageViewComponent() {
 	}
@@ -56,9 +58,9 @@ public class ImageViewComponent extends JComponent {
 		setToInitialPosition();
 	}
 	
-	public void putPolygon(String name, Polygon poly) {
+	public void putShape(String name, Shape shape) {
 
-		drawables.put(name, new DrawableShape(poly));
+		drawables.put(name, new DrawableShape(shape));
 	}
 
 	// TODO
@@ -102,7 +104,13 @@ public class ImageViewComponent extends JComponent {
 		scale.scale(value, value);
 	}
 	
+	public void disableKeyboard(){
+		keyboardEnabled = false;
+	}
 	
+	public void enableKeyboard(){
+		keyboardEnabled = true;
+	}
 	
 	public void setScale(double scaleX, double scaleY) {
 		scale.setToScale(scaleX, scaleY);
@@ -164,7 +172,7 @@ public class ImageViewComponent extends JComponent {
 		MyKeyAdapter keyAdapter = new MyKeyAdapter();
 		this.addKeyListener(keyAdapter);
 	}
-	class MyComponentAdapter extends ComponentAdapter {
+	public class MyComponentAdapter extends ComponentAdapter {
 
 		@Override
 		public void componentResized(ComponentEvent e) {
@@ -176,10 +184,12 @@ public class ImageViewComponent extends JComponent {
 		}
 	}
 	
-	class MyKeyAdapter extends KeyAdapter{
+	public class MyKeyAdapter extends KeyAdapter{
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
+			
+			if(keyboardEnabled == false ) return;
 			System.out.println("key pressed");
 			super.keyPressed(e);
 			if(noImage) return;
@@ -210,7 +220,7 @@ public class ImageViewComponent extends JComponent {
 		
 		@Override
 		public void keyTyped(KeyEvent e) {
-			super.keyTyped(e);
+			if(keyboardEnabled == false) return;
 			if(noImage) return;
 			if(e.getKeyChar() == "+".charAt(0)){
 				//System.out.println("magnifying ");

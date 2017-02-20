@@ -17,8 +17,14 @@
 		<property name="imageCollectionView">
 			<ref bean="imageCollectionView" />
 		</property>
-		<property name="imageLookup">
-			<ref bean="imageLookup" />
+		<property name="sourceImageView">
+			<ref bean="sourceImageViewComponent" />
+		</property>
+		<property name="boardRegionViewPane">
+			<ref bean="boardRegionViewPane" />
+		</property>
+		<property name="topMenu">
+			<ref bean="topMenu" />
 		</property>
 		<property name="imageController">
 			<ref bean="imageController" />
@@ -65,35 +71,68 @@
 		</property>
 	</bean>
 
-	<bean id="imageLookup" class="imagemanager.gui.imagelookup.ImageLookupPanel"
+	<bean id="boardRegionViewPane" class="imagemanager.gui.imagelookup.BoardRegionViewPane"
 		init-method="initialize">
-		<property name="sourceImageViewComponent">
-			<ref bean="sourceImageViewComponent" />
+		<property name="boardRegionView">
+			<ref bean="boardRegionViewComponent"/>
 		</property>
-		<property name="boardRegionsPane">
-			<ref bean="boardRegionsPane"/>
+	</bean>
+	
+	<bean id="sourceImageViewComponent" class="imagemanager.view.SourceImageViewComponent"
+		init-method="initialize">
+		<property name="imageController">
+			<ref bean="imageController" />
+		</property>
+		<property name="brController">
+				<ref bean="boardRegionController"/>
 		</property>
 	</bean>
 
-	<bean id="sourceImageViewComponent" class="imagemanager.gui.imagelookup.SourceImageViewComponent" init-method="initialize">
-		<property name="imageController">
-			<ref bean="imageController"/>
+	<bean id="boardRegionViewComponent" class="imagemanager.view.BoardRegionViewComponent"
+		init-method="initialize">
+		<property name="boardRegionController">
+			<ref bean="boardRegionController" />
 		</property>
 	</bean>
 	
-	<bean id="boardRegionsPane" class="imagemanager.gui.imagelookup.BoardRegionsPane">
+	<bean id="topMenu" class="imagemanager.gui.MainTopMenu"
+		init-method="initialize">
+		<property name="categoryController">
+			<ref bean="categoryController" />
+		</property>
+		<property name="imageController">
+			<ref bean="imageController" />
+		</property>
+		<property name="boardController">
+			<ref bean="boardRegionController" />
+		</property>
+		<property name="boardRegionSettings">
+			<ref bean="boardRegionSettings"/>
+		</property>
 	</bean>
-	
+
 	<!-- Controllers -->
 	<bean id="imageController" class="imagemanager.controller.ImageController">
 		<property name="imageRepo">
 			<ref bean="imageRepo" />
 		</property>
-		<property name="imageLookup">
-			<ref bean="imageLookup" />
+		<property name="sourceImageView">
+			<ref bean="sourceImageViewComponent" />
+		</property>
+		<property name="boardRegionSettings">
+			<ref bean="boardRegionSettings"/>
 		</property>
 	</bean>
-
+	
+	<bean id="boardRegionController" class="imagemanager.controller.BoardRegionController">
+		<property name="imageRepo">
+			<ref bean="imageRepo" />
+		</property>
+		<property name="view">
+			<ref bean="boardRegionViewComponent"/>
+		</property>
+	</bean>
+	
 	<bean id="categoryController" class="imagemanager.controller.CategoryController"
 		init-method="initializeViews">
 		<property name="categoryRepo">
@@ -127,6 +166,10 @@
 	<!-- Model -->
 
 	<!-- Persistence configuration -->
+	
+	<bean id="boardRegionSettings" class="imagemanager.model.BoardRegionSettings">
+	</bean>
+	
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
 		<property name="persistenceUnitName" value="image-manager" />
@@ -142,4 +185,5 @@
 	<tx:annotation-driven />
 	<bean id="categoryRepo" class="imagemanager.persistence.jpa.CategoryRepositoryJPA" />
 	<bean id="imageRepo" class="imagemanager.persistence.jpa.ImageRepositoryJPA" />
+
 </beans>

@@ -11,74 +11,76 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.opencv.core.Mat;
+
 public class Labeling4 {
-	private static int FG = 255;
 	private static int BG = 0;
 	
-	public static List<Region> run(BufferedImage binaryImage){
+	public static List<Region> run(Mat image){
 		List<Region> regions = new ArrayList<Region>();
-		MatrixI data = Util.grayToMatrixI(binaryImage);
 		DisjointSets<Integer> labelSets = new DisjointSetsForest<Integer>();
 		
 		// indeks zbioru w ktorym znajduse sie dana etykieta
 		Map<Integer, Integer> labelSetIndex = new HashMap<Integer, Integer>();
 		
+		MatrixI labeled = Util.mat2MatrixI(image);
 		int w;
 		int n;
 		
 		int l = 1;
 		
 		// first run
-		for(int i = 0; i < data.getSizeY(); i++){
-			for(int j = 0; j < data.getSizeX(); j++){
+		for(int j = 0; j < image.size().height; j++){
+			for(int i = 0; i < image.size().width; i++){
 				
-				if(data.getElement(j, i) == BG) continue;
-				w = getW(data, j, i);
-				n = getN(data, j, i);
+				if(labeled.getElement(i, j) == BG) continue;
+				w = getW(labeled, i, j);
+				n = getN(labeled, i, j);
 				
 				// nowa etykieta
 				if(w == 0 && n == 0){
-					data.setElement(j, i, l);
+					labeled.setElement(i, j, l);
 					int idx = labelSets.makeSet(l);
 					labelSetIndex.put(l, idx);
 					++l;
 				} else if(w != 0 && n != 0){
-					data.setElement(j, i, w);
+					labeled.setElement(i, j, w);
 					labelSets.union(labelSetIndex.get(w), labelSetIndex.get(n));
 				} else {
-					data.setElement(j, i, w == 0 ? n : w);
+					labeled.setElement(i, j, w == 0 ? n : w);					
 				}
 				
 				
 			}
 		}
-		data.print(System.out);
-		
+		//labeled.print(System.out);
+
 		// second run
-		for(int i = 0; i < data.getSizeY(); i++){
-			for(int j = 0; j < data.getSizeX(); j++){
-				if(data.getElement(j, i) == BG) continue;
-				int rootIdx = labelSets.findRootIndex(labelSetIndex.get(data.getElement(j, i)));
+		for(int i = 0; i < labeled.getSizeY(); i++){
+			for(int j = 0; j < labeled.getSizeX(); j++){
+				if(labeled.getElement(j, i) == BG) continue;
+				int rootIdx = labelSets.findRootIndex(labelSetIndex.get(labeled.getElement(j, i)));
 				int rootLabel = labelSets.getElement(rootIdx);
-				data.setElement(j, i, rootLabel);
+				labeled.setElement(j, i, rootLabel);
 				
 				
 			}
 		}
 		
-		data.print(System.out);
-		splitRegions(regions, data, binaryImage);
+		labeled.print(System.out);
+		//splitRegions(regions, data, binaryImage);
 		
-		return regions;
+		//return regions;
+		return null;
 	}
 		
-	private static int getW(MatrixI data,  int x, int y){
-		if(x-1 > -1 && x-1 < data.getSizeX()) return data.getElement(x-1, y);
+	private static int getW(MatrixI m, int i, int j){
+		if(i-1 > -1 && i-1 < m.getSizeX()) return m.getElement(i-1, j);
 		return 0;
 	}
 	
-	private static int getN(MatrixI data,  int x, int y){
-		if(y-1 > -1 && y-1 < data.getSizeY()) return data.getElement(x, y-1);
+	private static int getN(MatrixI m,  int i, int j){
+		if(j-1 > -1 && j-1 < m.getSizeY()) return m.getElement(i, j-1);
 		return 0;
 	}
 	

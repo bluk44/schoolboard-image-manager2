@@ -12,6 +12,8 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -22,6 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.InputMap;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -29,53 +33,40 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.Scrollable;
 
+import org.scijava.input.KeyCode;
+
 public class ThumbnailPanel extends JPanel implements Scrollable {
 
 	private static Integer thumbSize = 175;
 	private static int thumbIconAreaSize = 150, thumbMargin = 5;
 	
 	private boolean selectionActive;
-
-	private JMenuItem addImagesToCategory = null;
-	private JPopupMenu imagePopupMenu = null;
-
+		
 	private CategoryController categoryController;
 	private ImageController imageController;
-
-	private Set<ThumbnailComponent> selection = new HashSet<ThumbnailComponent>();
-
+	
+	private ThumbMouseListener thumbMouseListener = new ThumbMouseListener();
+	
+	private Set<String> selection = new HashSet<String>();
+	
 	public ThumbnailPanel() {
 		setLayout(myLayout);
-		// addMouseListener(mouseListener);
-		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke("ctrl pressed CONTROL"), "ctrl pressed");
-		getActionMap().put("ctrl pressed", new ActivateSelection());
-		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("released CONTROL"), "ctrl released");
-		getActionMap().put("ctrl released", new DisableSelection());
-		
-		setupPopupMenu();
-		
-		addKeyListener(new MyKeyListener());
+		setupListeners();
+		System.out.println("Thump Panel" + hasFocus());
 	}
 
 	public void setDisplayableImages(Collection<SourceImage> images) {
 		removeAll();
-		MyMouseListener listener = new MyMouseListener();
 		for (SourceImage image : images) {
-			ThumbnailComponent comp = new ThumbnailComponent(image.getName(), Util.getBufferedImage(image.getIcon()), thumbIconAreaSize, thumbMargin);
+			ThumbnailComponent comp = new ThumbnailComponent(image.getName(), Util.mat2Img(image.getIcon()), thumbIconAreaSize, thumbMargin);
+			comp.iconButton.addMouseListener(thumbMouseListener);
 			add(comp);
-			comp.iconButton.addMouseListener(new MyMouseListener());
-			//comp.iconButton.addKeyListener(new MyKeyListener());
-		}
+			}
 		refresh();
 	}
 
-	public Collection<String> getSelectedImagesNames() {
-		 Collection<String> names = new ArrayList<String>(selection.size());
-		 for (ThumbnailComponent thumb : selection) {
-		 names.add(thumb.getImageName());
-		 }
-		 return names;
+	public Set<String> getSelection(){
+		return selection;
 	}
 
 	@Override
@@ -198,25 +189,9 @@ public class ThumbnailPanel extends JPanel implements Scrollable {
 		}
 	}
 	
-	private void setupPopupMenu(){
-		imagePopupMenu = new JPopupMenu();
-		addImagesToCategory = new JMenuItem("Dodaj do kaegorii");
-		addImagesToCategory.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent paramActionEvent) {
-				System.out.println(paramActionEvent.getSource().getClass());
-				JOptionPane.showInputDialog(getRootPane(), "Nazwa kategorii");
-			}
-		});
-		imagePopupMenu.add(addImagesToCategory);
-	}
-	
-	private void resetSelection() {
-		Component[] comps = getComponents();
-		for (Component component : comps) {
-			((ThumbnailComponent) component).setSelected(false);
-		}
+	private void setupListeners(){
+		this.addKeyListener(new MyKeyListener());
+		
 	}
 
 	private ActionListener removeCategoryActionListener = new ActionListener() {
@@ -229,91 +204,42 @@ public class ThumbnailPanel extends JPanel implements Scrollable {
 
 	};
 	
-	private void removeDisplayableImages(Collection<SourceImage> images) {
-		int i = 0;
-		while (i < getComponentCount()) {
-			for (SourceImage image : images) {
-				if (((ThumbnailComponent) getComponent(i)).getName().equals(
-						image)) {
-					remove(i);
-				} else {
-					i++;
-				}
-			}
-		}
-		refresh();
-	}
 	
-	class MyMouseListener extends MouseAdapter{
+	class ThumbMouseListener extends MouseAdapter {
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			
-			System.out.println("mouse clicked");
+			requestFocus();
 			
-			if(e.getButton() == MouseEvent.BUTTON3){
-				imagePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+			ImageIconButton btn = (ImageIconButton)e.getSource();
+			ThumbnailComponent tc = (ThumbnailComponent)btn.getParent();
+			if(tc.isSelected()){
+				System.out.println(""+tc.getImageName()+" selected");
+				selection.add(tc.getImageName());
 			} else {
-				
-				ImageIconButton btn = (ImageIconButton)e.getSource();
-				ThumbnailComponent tc = (ThumbnailComponent)btn.getParent();
-				if(!selectionActive){
-					for (ThumbnailComponent thumbnailComponent : selection) {
-						thumbnailComponent.setSelected(false);
-					}
-					selection = new HashSet<ThumbnailComponent>();
-					
-					btn.setSelected(true);
-					selection.add((ThumbnailComponent)btn.getParent());
-
-				} else {
-					if(!btn.isSelected()){
-						btn.setSelected(false);
-						selection.remove(tc);
-					} else {
-						btn.setSelected(true);
-						selection.add(tc);
-					}
-				}
-									
-				requestFocusInWindow();
-				super.mouseClicked(e);						
+				selection.remove(tc.getImageName());
+				System.out.println(""+tc.getImageName()+"not selected");
 			}
 		}
-		
 	}
 	
 	class MyKeyListener extends KeyAdapter {
 		
 		@Override
-		public void keyPressed(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_ENTER){
-				if(selection.size() == 1){
-					imageController.setupImageView(((ThumbnailComponent)(selection.toArray()[0])).getImageName());
-				}
-			}
-			
+		public void keyReleased(KeyEvent e) {
+			 if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			 if(selection.size() == 1){
+				 for (String string : selection) {
+					imageController.openSourceImage(string);
+				}	
+			 }
+			 
+			 }		
 		}
+		
 	}
 	
-	class ActivateSelection extends AbstractAction {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectionActive = true;
-		}
-
-	}
-
-	class DisableSelection extends AbstractAction {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectionActive = false;
-		}
-
-	}
-
 	public CategoryController getCategoryController() {
 		return categoryController;
 	}
@@ -329,4 +255,5 @@ public class ThumbnailPanel extends JPanel implements Scrollable {
 	public void setImageController(ImageController imageController) {
 		this.imageController = imageController;
 	}
+
 }

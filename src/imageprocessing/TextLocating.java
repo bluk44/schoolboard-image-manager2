@@ -32,9 +32,11 @@ public class TextLocating {
 		}
 	}
 
-	private static int squareSize = 10;
+	private static int squareSize = 47;
 
 	public static List<Polygon> findTextPolygons(BufferedImage image) {
+		
+		System.out.println(image == null);
 		
 		int nh = (int) Math.round(image.getHeight() / (double) squareSize);
 		int nw = (int) Math.round(image.getWidth() / (double) squareSize);
@@ -43,6 +45,7 @@ public class TextLocating {
 		double yScale = (double) (nh * squareSize) / image.getHeight();
 
 		BufferedImage corrected = Util.resize(image, xScale, yScale);
+		Test.showImage(corrected, corrected.getWidth()+" "+corrected.getHeight());
 //		BufferedImage textRegionsMap = new BufferedImage(nw, nh,
 //				BufferedImage.TYPE_BYTE_GRAY);
 //		Color c = new Color(255, 255, 255);
@@ -60,10 +63,10 @@ public class TextLocating {
 //		}
 
 		BufferedImage textRegionsMap = createTextRegionsMap(corrected);
-		
+		Test.showImage(corrected, "corrected");
+		Test.showImage(textRegionsMap, "textRegionsMap");
 		fillIsolatedBackground(textRegionsMap);
 		
-		Test.showImage(textRegionsMap, "textRegionsMap");
 		
 		List<Region> regions = Labeling4.run(textRegionsMap);
 		List<Polygon> polys = new ArrayList<Polygon>(regions.size());
@@ -80,6 +83,8 @@ public class TextLocating {
 		}
 
 		return polys;
+		
+		return null;
 	}
 
 	private static BufferedImage createTextRegionsMap(BufferedImage image){

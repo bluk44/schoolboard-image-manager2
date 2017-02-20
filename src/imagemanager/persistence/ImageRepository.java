@@ -13,5 +13,8 @@ public interface ImageRepository {
 	SourceImage saveImage(SourceImage image);
 	Collection<SourceImage> loadImagesFromCategories(String... categoryTitles);
 	void deleteImage(SourceImage image);
+	BoardRegion loadBoardRegion(Long id);
 	void deleteBoardRegion(BoardRegion region);
+	BoardRegion updateBoardRegion(BoardRegion region);
+	
 }

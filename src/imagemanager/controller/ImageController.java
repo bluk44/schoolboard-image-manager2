@@ -1,73 +1,65 @@
 package imagemanager.controller;
 
-import imagemanager.gui.imagelookup.ImageLookupPanel;
-import imagemanager.gui.imagelookup.SourceImageViewComponent;
-import imagemanager.gui.imagelookup.SourceImageViewComponent.Mode;
 import imagemanager.model.BoardRegion;
+import imagemanager.model.BoardRegionSettings;
 import imagemanager.model.SourceImage;
 import imagemanager.persistence.ImageRepository;
+import imagemanager.view.SourceImageViewComponent;
 
 import java.awt.Point;
 import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.persistence.exceptions.DatabaseException;
-
 public class ImageController {
 
+	// model
+	private SourceImage sourceImage;
 	private ImageRepository imageRepo;
-	protected ImageLookupPanel imageLookup;
+	private BoardRegionSettings boardRegionSettings;
+
+	// view
+	SourceImageViewComponent sourceImageView;
 
 	public void createSourceImage(File f) {
-		System.out.println("create source image called");
 		SourceImage sourceImage = new SourceImage(f);
-		try{
+		try {
 			imageRepo.saveImage(sourceImage);
-		} catch(Exception e){
-			System.out.println("database extepion writing image "+f.getName());		
+		} catch (Exception e) {
+			System.out
+					.println("database extepion writing image " + f.getName());
 		}
 	}
-	
-	public void openBoardRegion(Long id){
-		SourceImage source = imageLookup.getSourceImage();
-		Set<BoardRegion> regions = source.getBoardImages();
-		for (BoardRegion region : regions) {
-			if(region.getId().equals(id)){
-				imageLookup.getBoardRegionsPane().openBoardRegion(region);
-				break;
-			}
-		}
+
+	public void createBoardRegion(Point[] quadrangle) {
+		sourceImage.createBoardRegion(quadrangle,
+				boardRegionSettings.getBoardType(),
+				boardRegionSettings.getBoardRegionParams());
+
+		sourceImage = imageRepo.saveImage(sourceImage);
+		updateSourceImageView(sourceImage);
 	}
-	
-	public void createBoardRegion(Point[] quadrangle){
-		SourceImage source = imageLookup.getSourceImage();
-		source.extractBoardRegion(quadrangle);
-		
-		source = imageRepo.saveImage(source);
-		
-		updateSourceImageView(source);
-	}
-	
-	public void deleteBoardRegion(Long id){
-		SourceImage source = imageLookup.getSourceImage();
-		Set<BoardRegion> regions = source.getBoardImages();
+
+	public void deleteBoardRegion(Long id) {
+
+		Set<BoardRegion> regions = sourceImage.getBoardImages();
 		for (BoardRegion region : regions) {
-			if(region.getId().equals(id)){
+			if (region.getId().equals(id)) {
+				regions.remove(region);
 				imageRepo.deleteBoardRegion(region);
-				source.getBoardImages().remove(region);
-				
-				updateSourceImageView(source);
 				break;
 			}
 		}
-	
+		updateSourceImageView(sourceImage);
+
+
 	}
-	
-	public void setupImageView(String imageName) {
-		SourceImage source = imageRepo.findImage(imageName);
-		
-		updateSourceImageView(source);
+
+	public void openSourceImage(String imageName) {
+
+		sourceImage = imageRepo.findImage(imageName);
+		updateSourceImageView(sourceImage);
+
 	}
 
 	public ImageRepository getImageRepo() {
@@ -78,31 +70,40 @@ public class ImageController {
 		this.imageRepo = imageRepo;
 	}
 
-	public ImageLookupPanel getImageLookup() {
-		return imageLookup;
+	public BoardRegionSettings getBoardRegionSettings() {
+		return boardRegionSettings;
 	}
 
-	public void setImageLookup(ImageLookupPanel imageLookup) {
-		this.imageLookup = imageLookup;
+	public void setBoardRegionSettings(BoardRegionSettings boardRegionSettings) {
+		this.boardRegionSettings = boardRegionSettings;
 	}
-	
-	private void updateSourceImageView(SourceImage source){
-		imageLookup.setSourceImage(source);
 
-		SourceImageViewComponent view = imageLookup.getSourceImageViewComponent();
-		
-		Collection<Long> brKeys = view.getRegionKeys();
+	private void updateSourceImageView(SourceImage image) {
+
+		sourceImageView.setSourceImage(sourceImage);
+
+		Collection<Long> brKeys = sourceImageView.getRegionKeys();
 		for (Long id : brKeys) {
-			view.removeBoardregionQuadrangle(id);
+			sourceImageView.removeBoardregionQuadrangle(id);
 		}
-		
-		Set<BoardRegion> regions = imageLookup.getSourceImage().getBoardImages();
-		
+
+		Set<BoardRegion> regions = sourceImage.getBoardImages();
+
 		for (BoardRegion boardRegion : regions) {
-			view.putBoardRegionQuadranle(boardRegion.getId(), boardRegion.getPerimeter());
+			sourceImageView.putBoardRegionQuadranle(boardRegion.getId(),
+					boardRegion.getPerimeter());
 		}
-		view.setMode(Mode.DISPLAY);
-		view.fitImageToComponent();
-		view.repaint();
+		sourceImageView.resetView();
+		sourceImageView.fitImageToComponent();
+		sourceImageView.repaint();
+
+	}
+
+	public SourceImageViewComponent getSourceImageView() {
+		return sourceImageView;
+	}
+
+	public void setSourceImageView(SourceImageViewComponent sourceImageView) {
+		this.sourceImageView = sourceImageView;
 	}
 }

@@ -1,9 +1,9 @@
 package imagemanager.model;
 
+import imagemanager.model.BoardRegion.BoardType;
 import imageprocessing.Util;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,14 +25,16 @@ import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import test.Test;
+
+
 
 @Entity
 public class SourceImage {
+	
 	@Transient
 	// rozmiar ikony w pikselach
 	static float ICON_SIZE = 160000; 
-
+	
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -42,11 +44,19 @@ public class SourceImage {
 
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	private byte[] icon;
+	private byte[] iconPixels;
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
-	private byte[] pixels;
-
+	private byte[] imagePixels;
+	
+	private int imageWidth;
+	private int imageHeight;
+	
+	private int iconWidth;
+	private int iconHeight;
+	
+	private int openCVType;
+	
 	@ManyToMany(mappedBy = "images")
 	Set<Category> categories = new HashSet<Category>();
 
@@ -56,60 +66,71 @@ public class SourceImage {
 	public SourceImage() {
 	};
 
+	public SourceImage(String name, Long date, byte[] iconPixels,
+			byte[] imagePixels, int imageWidth, int imageHeight, int iconWidth,
+			int iconHeight, int openCVType) {
+		super();
+		this.name = name;
+		this.date = date;
+		this.iconPixels = iconPixels;
+		this.imagePixels = imagePixels;
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
+		this.iconWidth = iconWidth;
+		this.iconHeight = iconHeight;
+		this.openCVType = openCVType;
+	}
+	
 	public SourceImage(File file) {
 		String[] tab = file.getName().split("/");
 		this.name = tab[tab.length - 1];
 		this.date = file.lastModified();
-		BufferedImage pixels = Util.readImageFromFile(file);
-		float imageSize = pixels.getWidth() * pixels.getHeight();
-		float scale = ICON_SIZE / imageSize;
-		System.out.println("scale "+scale);
-		BufferedImage icon = Util.resize(pixels, scale, scale);
-		this.pixels = Util.getByteArray(pixels);
-		this.icon = Util.getByteArray(icon);
-
+		//Mat image = imread(file.getPath());
+		Mat image = imread
+		Mat icon = new Mat();
+		
+		this.openCVType = image.type();
+		
+		this.imageHeight = (int) image.size().height;
+		this.imageWidth = (int) image.size().width;
+				
+		double imgSize = imageWidth * imageHeight;
+		double scale = ICON_SIZE / (imageWidth * imageHeight);
+		Imgproc.resize(image, icon, new Size(image.size().width * scale, image.size().height * scale));
+		
+		this.iconWidth = (int) icon.size().width;
+		this.iconHeight = (int) icon.size().height;
+		
+		this.imagePixels = Util.mat2Byte(image);
+		this.iconPixels = Util.mat2Byte(icon);
+	
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public Long getDate() {
 		return date;
 	}
-
-	public void setDate(Long date) {
-		this.date = date;
+	
+	public Mat getImage(){
+		Mat image = new Mat(new Size(imageWidth, imageHeight), openCVType);
+		image.put(0, 0, getImagePixels());
+		return image;
 	}
-
-	public byte[] getIcon() {
+	
+	
+	public Mat getIcon(){
+		Mat icon = new Mat(new Size(iconWidth, iconHeight), openCVType);
+		icon.put(0, 0, getIconPixels());
 		return icon;
 	}
-
-	public void setIcon(byte[] icon) {
-		this.icon = icon;
-	}
-
-	public byte[] getPixels() {
-		return pixels;
-	}
-
-	public void setPixels(byte[] pixels) {
-		this.pixels = pixels;
-	}
-
+	
 	public Set<Category> getCategories() {
 		return categories;
 	}
@@ -125,71 +146,24 @@ public class SourceImage {
 	public void setBoardImages(Set<BoardRegion> boardImages) {
 		this.boardImages = boardImages;
 	}
+	
+	@Override
+	public String toString() {
+		return "SourceImage [id=" + id + ", name=" + name + ", date=" + date
+				+ "]";
+	}
 
-//	public void extractBoardRegion(Point[] quadrangle) {
-//		
-//		BufferedImage image = Util.getBufferedImage(this.pixels);
-//		
-//		
-//		ImageProcessor ip1 = Util.convertToImageProcessor(image);
-//		ImageProcessor ip2 = ip1.duplicate();
-//
-//		int x1 = (quadrangle[0].x + quadrangle[3].x) / 2;
-//		int y1 = (quadrangle[0].y + quadrangle[1].y) / 2;
-//		int x2 = (quadrangle[1].x + quadrangle[2].x) / 2;
-//		int y2 = (quadrangle[2].y + quadrangle[3].y) / 2;
-//		
-//		Point[] fixed = new Point[4];
-//
-//		fixed[0] = new Point(x1, y1);
-//		fixed[1] = new Point(x2, y1);
-//		fixed[2] = new Point(x2, y2);
-//		fixed[3] = new Point(x1, y2);
-//
-//		ArrayList<PointMatch> m = new ArrayList<PointMatch>();
-//
-//		for (int i = 0; i < 4; i++) {
-//			m.add(new PointMatch(new mpicbg.models.Point(new float[] {
-//					quadrangle[i].x, quadrangle[i].y }),
-//					new mpicbg.models.Point(new float[] { fixed[i].x,
-//							fixed[i].y })));
-//		}
-//		
-//		HomographyModel2D model = new HomographyModel2D();
-//		InverseTransformMapping<HomographyModel2D> mapping = new InverseTransformMapping<HomographyModel2D>(
-//				model);
-//		
-//		try {
-//			model.fit(m);
-//			mapping.mapInterpolated(ip1, ip2);
-//
-//		} catch (NotEnoughDataPointsException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IllDefinedDataPointsException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		BufferedImage clipped = Util.subImage(ip2.getBufferedImage(), x1, y1, x2, y2);
-//		
-//		// czyszczenie tla
-//		Color[] colors = new Color[2];
-//		BufferedImage binarized = BackgroundCleaner.run(clipped, colors);
-//		
-//		BoardRegion boardRegion = new BoardRegion();
+	private byte[] getIconPixels() {
+		return iconPixels;
+	}
 
-//		boardRegion.setPerimeter(new MyQuadrangle(quadrangle));
-//		boardImages.add(boardRegion);
-//		boardRegion.setSourceImage(this);
-//		Test.showImage(clipped, "clipped");
-//		
-//	}
-
-	public void extractBoardRegion(Point[] quadrangle){
+	private byte[] getImagePixels() {
+		return imagePixels;
+	}
+	
+	public void createBoardRegion(Point[] quadrangle, BoardType boardType, BoardRegionParams params){
 		
-		BufferedImage image = Util.getBufferedImage(this.pixels);
-		Mat imageMat = Util.image2Mat(image);
+		Mat image = getImage();
 		
 		int x1 = (quadrangle[0].x + quadrangle[3].x) / 2;
 		int y1 = (quadrangle[0].y + quadrangle[1].y) / 2;
@@ -203,7 +177,7 @@ public class SourceImage {
 		fixed[2] = new Point(x2, y2);
 		fixed[3] = new Point(x1, y2);
 		
-		Mat dstImage = new Mat(x2 - x1 - 1, y2 - y1 - 1, imageMat.type());
+		Mat dstImage = new Mat(x2 - x1 - 1, y2 - y1 - 1, image.type());
 		
 		Mat dst = new Mat(4, 2, CvType.CV_32F);
 		dst.put(0, 0, 0);
@@ -226,16 +200,21 @@ public class SourceImage {
 		src.put(3, 1, quadrangle[3].y);
 		
 		Mat trans = Imgproc.getPerspectiveTransform(src, dst);
-		Imgproc.warpPerspective(imageMat, dstImage, trans, new Size(x2 - x1 - 1, y2 - y1 - 1));
-		Test.showImage(Util.mat2Img(dstImage), "dstimage");
-
+		Imgproc.warpPerspective(image, dstImage, trans, new Size(x2 - x1 - 1, y2 - y1 - 1));
+		
+		if(params == null && boardType == BoardType.BLACKBOARD){
+			params = BoardRegionParams.getDefaultBBParams();
+		} else if(params == null && boardType == BoardType.WHITEBOARD){
+			params = BoardRegionParams.getDefaultWBParams();
+		}
+		
+		BoardRegion region = new BoardRegion(dstImage, quadrangle, boardType, params);
+		region.clearBackground();
+		//region.extractTextRegions();
+		
+		boardImages.add(region);
+		region.setSourceImage(this);
+		
 	}
 	
-	
-	@Override
-	public String toString() {
-		return "SourceImage [id=" + id + ", name=" + name + ", date=" + date
-				+ "]";
-	}
-
 }
