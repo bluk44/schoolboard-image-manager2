@@ -4,8 +4,7 @@ import imagemanager.controller.BoardRegionController;
 import imagemanager.gui.imagelookup.ImageViewComponent;
 import imagemanager.model.BoardRegion;
 import imagemanager.model.TextRegion;
-import imagemanager.view.SourceImageViewComponent.DisplayMode;
-import imagemanager.view.SourceImageViewComponent.MyMouseAdapter;
+import imagemanager.model.boardedition.BoardEditionModel;
 import imageprocessing.Util;
 
 import java.awt.Graphics;
@@ -33,6 +32,8 @@ public class BoardRegionViewComponent extends ImageViewComponent {
 	private JMenuItem MImarkTextRegion;
 	
 	private RectangleMarker rectMarker = new RectangleMarker();
+	
+	private BoardEditionModel boardEditionModel;
 	
 	public void initialize(){
 		super.initialize();

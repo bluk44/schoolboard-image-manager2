@@ -5,9 +5,11 @@ import imageprocessing.Util;
 
 import java.awt.Point;
 import java.awt.Polygon;
+import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
@@ -26,8 +28,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-
-import test.Test;
 
 @Entity
 public class BoardRegion {
@@ -54,12 +54,28 @@ public class BoardRegion {
 	@Embedded
 	BoardRegionParams params;
 	
+	
+	// Zdjęcie początkowe do którego zawsze można wrócić
+	// bez nałożonej maski
 	@Lob
-	private byte[] unprocessed;
+	private byte[] rawPicture;
+	
+	// Macierz spójnych składowych 
+	// 0 - tło 
+	// inne numery to ID spójnych składowych
 	@Lob
-	private byte[] mask;
+	private int[] labeledText;
+	
+	// Oczyszczone zdjęcie z nałożoną maską
 	@Lob
 	private byte[] result;
+	
+	// Maska którą nakłada się na surowe zdjęcie
+	@Lob
+	private byte[] mask;
+	
+	// Aktualnie zaznaczone spójne składowe
+	Map<Integer, Boolean> marking;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private SourceImage sourceImage;
@@ -79,7 +95,7 @@ public class BoardRegion {
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
 		this.openCVType = openCVType;
-		this.unprocessed = pixels;
+		this.rawPicture = pixels;
 		this.boardType = boardType;
 	}
 	
@@ -87,7 +103,7 @@ public class BoardRegion {
 		this.imageWidth = image.width();
 		this.imageHeight = image.height();
 		this.openCVType = image.type();
-		this.unprocessed = Util.mat2Byte(image);
+		this.rawPicture = Util.mat2Byte(image);
 		this.perimeter = new MyQuadrangle(quadrangle);
 		this.boardType = boardType;
 		this.params = params;
@@ -123,7 +139,9 @@ public class BoardRegion {
 			break;
 			
 		}
-				
+		
+		
+		
 		// subtract mask
 		// napisy na pierwszym planie
 		Mat fg = image.clone();
@@ -175,7 +193,7 @@ public class BoardRegion {
 	
 	public SourceImage getSourceImage() {
 		return sourceImage;
-	}
+	} 
 
 	public void setSourceImage(SourceImage sourceImage) {
 		this.sourceImage = sourceImage;
@@ -190,7 +208,7 @@ public class BoardRegion {
 	}
 	
 	private byte[] getUnprocessed(){
-		return unprocessed;
+		return rawPicture;
 	}
 
 	public BoardType getBoardType() {
@@ -245,5 +263,5 @@ public class BoardRegion {
 		return "BoardRegion [id=" + id + ", perimeter=" + perimeter + "]";
 	}
 
-
+	
 }
