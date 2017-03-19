@@ -39,6 +39,9 @@ public class BoardRegionViewComponent extends ImageViewComponent {
 		super.initialize();
 		setupListeners();
 		setupPopupMenu();
+		
+		System.out.println(mode);
+		
 	}
 	
 	public void setBoardRegion(BoardRegion region){
@@ -110,10 +113,6 @@ public class BoardRegionViewComponent extends ImageViewComponent {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			
-			//if (noImage)
-			//	return;
-//			System.out.println("mouse clicked");
-
 			if(e.getButton() == MouseEvent.BUTTON3){
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			} else if(mode == DisplayMode.TEXT_REGION_SELECTION && e.getButton() == MouseEvent.BUTTON1){

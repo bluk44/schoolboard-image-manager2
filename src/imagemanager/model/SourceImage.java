@@ -23,6 +23,7 @@ import javax.persistence.Transient;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
 
@@ -33,7 +34,7 @@ public class SourceImage {
 	
 	@Transient
 	// rozmiar ikony w pikselach
-	static float ICON_SIZE = 160000; 
+	static float ICON_SIZE = 160000;
 	
 	@Id
 	@GeneratedValue
@@ -85,8 +86,8 @@ public class SourceImage {
 		String[] tab = file.getName().split("/");
 		this.name = tab[tab.length - 1];
 		this.date = file.lastModified();
-		//Mat image = imread(file.getPath());
-		Mat image = imread
+		Mat image = Highgui.imread(file.getPath());
+		//Mat image = Util.readFromFileAsMat(file.getName());
 		Mat icon = new Mat();
 		
 		this.openCVType = image.type();
@@ -96,6 +97,7 @@ public class SourceImage {
 				
 		double imgSize = imageWidth * imageHeight;
 		double scale = ICON_SIZE / (imageWidth * imageHeight);
+		
 		Imgproc.resize(image, icon, new Size(image.size().width * scale, image.size().height * scale));
 		
 		this.iconWidth = (int) icon.size().width;
@@ -210,8 +212,7 @@ public class SourceImage {
 		
 		BoardRegion region = new BoardRegion(dstImage, quadrangle, boardType, params);
 		region.clearBackground();
-		//region.extractTextRegions();
-		
+				
 		boardImages.add(region);
 		region.setSourceImage(this);
 		

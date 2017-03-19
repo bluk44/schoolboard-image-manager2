@@ -60,22 +60,15 @@ public class BoardRegion {
 	@Lob
 	private byte[] rawPicture;
 	
-	// Macierz spójnych składowych 
-	// 0 - tło 
-	// inne numery to ID spójnych składowych
-	@Lob
-	private int[] labeledText;
 	
 	// Oczyszczone zdjęcie z nałożoną maską
 	@Lob
 	private byte[] result;
 	
 	// Maska którą nakłada się na surowe zdjęcie
+	// odseparowuje tlo
 	@Lob
 	private byte[] mask;
-	
-	// Aktualnie zaznaczone spójne składowe
-	Map<Integer, Boolean> marking;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private SourceImage sourceImage;
@@ -155,25 +148,25 @@ public class BoardRegion {
 		
 		result = Util.mat2Byte(image);
 		
-		List<Polygon> textPolygons = TextLocating.findTextPolygons(Util.mat2Img(mask));
-		for (Polygon polygon : textPolygons) {
-			TextRegion textRegion = new TextRegion();
-			textRegion.setPerimeter(polygon);
-			textRegion.setBoardRegion(this);
-			textRegions.add(textRegion);
-		}
+//		List<Polygon> textPolygons = TextLocating.findTextPolygons(Util.mat2Img(mask));
+//		for (Polygon polygon : textPolygons) {
+//			TextRegion textRegion = new TextRegion();
+//			textRegion.setPerimeter(polygon);
+//			textRegion.setBoardRegion(this);
+//			textRegions.add(textRegion);
+//		}
 	}
 	
 	public void extractTextRegions() {
 		
-		Mat image = getResultImage();
-		List<Polygon> textPolygons = TextLocating.findTextPolygons(Util.mat2Img(image));
-		for (Polygon polygon : textPolygons) {
-			TextRegion textRegion = new TextRegion();
-			textRegion.setPerimeter(polygon);
-			textRegion.setBoardRegion(this);
-			textRegions.add(textRegion);
-		}
+//		Mat image = getResultImage();
+//		List<Polygon> textPolygons = TextLocating.findTextPolygons(Util.mat2Img(image));
+//		for (Polygon polygon : textPolygons) {
+//			TextRegion textRegion = new TextRegion();
+//			textRegion.setPerimeter(polygon);
+//			textRegion.setBoardRegion(this);
+//			textRegions.add(textRegion);
+//		}
 	}
 	
 	public Long getId(){
