@@ -1,22 +1,41 @@
 package imagemanager.model.boardedition;
 
-import imageprocessing.matrix.MatrixI;
-
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+
+import org.opencv.core.Mat;
 
 public class BoardEditionModel {
 	
 	private Map<Integer, TextComponent> textComponents;
-	private MatrixI textCompMatrix;
+	Mat labeledTextComponents;
 	
-	public BoardEditionModel(MatrixI textCompMatrix){
-		this.textCompMatrix = textCompMatrix;
+	public BoardEditionModel(Mat lct){
+		labeledTextComponents = lct;
+		initTextComps();
 	}
 	
-	public void markComponent(int id, boolean marked){
-		textComponents.get(id).setMarked(marked);		
+	private void initTextComps(){
+		textComponents = new HashMap<Integer, TextComponent>();
+		for(int i = 0; i < labeledTextComponents.height(); i++){
+			for(int j = 0; j < labeledTextComponents.width(); j++){
+				int[] data = new int[1];
+				labeledTextComponents.get(i, j, data);
+				if(data[0] != 0){
+					TextComponent txtComp = new TextComponent(data[0]);
+					textComponents.put(txtComp.getId(), txtComp);
+				}
+			}
+		}
 	}
 	
-	
+	// zaznaza komponent o podanych wspolrzednych
+	// kliknieicie myszka
+	public void markTextComp(int x , int y, boolean isMarked){
+		int[] data = new int[1];
+		labeledTextComponents.get(y, x, data);
+		if(data[0] == 0) return;
+		textComponents.get(data[0]).setMarked(isMarked);		
+	}
+		
 }

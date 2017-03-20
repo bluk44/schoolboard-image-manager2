@@ -9,6 +9,16 @@ public class TextComponent {
 	private boolean marked;
 	private Rectangle bounds;
 	
+	// TODO dopisac bounds do konstruktora
+	public TextComponent(int id){
+		this.id = id;
+		this.marked = false;
+	}
+	
+	public int getId(){
+		return id;
+	}
+	
 	public void setMarked(boolean marked){
 		this.marked = marked;
 	}
