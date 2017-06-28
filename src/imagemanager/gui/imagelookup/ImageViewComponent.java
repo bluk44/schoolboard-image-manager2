@@ -50,6 +50,11 @@ public class ImageViewComponent extends JComponent {
 		setToInitialPosition();
 	}
 	
+	public BufferedImage getImage(){
+		DrawableImage image = (DrawableImage) drawables.get("image");
+		return image.getImage();
+	}
+	
 	public void clear(){
 		DrawableImage noImage = new DrawableImage();
 		drawables = new HashMap<String, DrawableObject>();
@@ -116,7 +121,14 @@ public class ImageViewComponent extends JComponent {
 		scale.setToScale(scaleX, scaleY);
 		setToInitialPosition();
 	}
-
+	
+	public AffineTransform getTranslation(){
+		return translation;
+	}
+	
+	public AffineTransform getScale(){
+		return scale;
+	}
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);

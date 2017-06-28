@@ -174,11 +174,11 @@ public class MainTopMenu extends JMenuBar {
 		importImagesMenuItem.addActionListener(new ImportImagesActionListener());
 		
 		editBoardRegionOption.addActionListener(new ActionListener() {
-			
+		 	
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				BoardRegionEditionDialog dialog = new BoardRegionEditionDialog(null, false, boardController);
-			}
+			} 
 		});
 		
 		blackBoardOption.addActionListener(new ActionListener(){

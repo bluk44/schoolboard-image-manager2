@@ -43,7 +43,7 @@ public class BoardRegionController {
 	}
 	
 	public void updateBoardRegion(){
-		boardRegion.clearBackground();
+		boardRegion.updateMask();
 		updateView();
 	}
 	

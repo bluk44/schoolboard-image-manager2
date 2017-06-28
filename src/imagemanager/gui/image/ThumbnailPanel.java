@@ -58,7 +58,7 @@ public class ThumbnailPanel extends JPanel implements Scrollable {
 	public void setDisplayableImages(Collection<SourceImage> images) {
 		removeAll();
 		for (SourceImage image : images) {
-			ThumbnailComponent comp = new ThumbnailComponent(image.getName(), Util.mat2Img(image.getIcon()), thumbIconAreaSize, thumbMargin);
+			ThumbnailComponent comp = new ThumbnailComponent(image.getName(), Util.mat2Img(image.getIcon().getMat()), thumbIconAreaSize, thumbMargin);
 			comp.iconButton.addMouseListener(thumbMouseListener);
 			add(comp);
 			}

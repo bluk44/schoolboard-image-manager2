@@ -61,38 +61,39 @@ public class CategoryController {
 	}
 	
 	public void assignImagesToCategories(){
-		Collection<CategoryViewObject> catObjs = categoryView.getSelectedCategories();
-		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
-		List<Category> categories = new ArrayList<Category>();
-		for (CategoryViewObject catObj : catObjs) {
-			categories.add(categoryRepo.findCategory(catObj.getTitle()));
-		}
-		List<SourceImage> images = new ArrayList<SourceImage>();
-		for (String name : imageNames) {
-			images.add(imageRepo.findImage(name));
-		}
-		
-		for (Category category : categories) {
-			for (SourceImage sourceImage : images) {
-				category.addImageToCategory(sourceImage);
-			}
-			categoryRepo.saveCategory(category);
-		}
+//		Collection<CategoryViewObject> catObjs = categoryView.getSelectedCategories();
+//		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
+//		List<Category> categories = new ArrayList<Category>();
+//		for (CategoryViewObject catObj : catObjs) {
+//			categories.add(categoryRepo.findCategory(catObj.getTitle()));
+//		}
+//		List<SourceImage> images = new ArrayList<SourceImage>();
+//		for (String name : imageNames) {
+//			images.add(imageRepo.findImage(name));
+//		}
+//		
+//		for (Category category : categories) {
+//			for (SourceImage sourceImage : images) {
+//				category.addImageToCategory(sourceImage);
+//			}
+//			categoryRepo.saveCategory(category);
+//		}
 	}
 	
 	public void unassignCategoryFromImages(String categoryTitle){
-		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
-		categoryRepo.unassignCategoryFromImages(categoryTitle, imageNames.toArray(new String[]{}));
+//		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
+//		categoryRepo.unassignCategoryFromImages(categoryTitle, imageNames.toArray(new String[]{}));
 	}
 	
 	public Collection<String> getCategoryNamesFromSelectedImages(){
-		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
-		Collection<Category> categories = categoryRepo.loadCategoriesFromImages(imageNames.toArray(new String[]{}));
-		Collection<String> catTitles = new ArrayList<String>();
-		for (Category category : categories) {
-			catTitles.add(category.getTitle());
-		}
-		return catTitles;
+//		Collection<String> imageNames = thumbnailPanel.getSelectedImagesNames();
+//		Collection<Category> categories = categoryRepo.loadCategoriesFromImages(imageNames.toArray(new String[]{}));
+//		Collection<String> catTitles = new ArrayList<String>();
+//		for (Category category : categories) {
+//			catTitles.add(category.getTitle());
+//		}
+//		return catTitles;
+		return null;
 	}
 	
 

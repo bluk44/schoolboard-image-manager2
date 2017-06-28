@@ -89,7 +89,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	}
 
 	public void setSourceImage(SourceImage source) {
-		setImage(Util.mat2Img(source.getImage()));
+		setImage(Util.mat2Img(source.getImage().getMat()));
 	}
 
 	public ImageController getImageController() {

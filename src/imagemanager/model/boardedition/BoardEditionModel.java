@@ -8,19 +8,19 @@ import org.opencv.core.Mat;
 public class BoardEditionModel {
 	
 	private Map<Integer, TextComponent> textComponents;
-	Mat labeledTextComponents;
+	Mat bianrizedBoardImage;
 	
-	public BoardEditionModel(Mat lct){
-		labeledTextComponents = lct;
+	public BoardEditionModel(Mat ltc){
+		bianrizedBoardImage = ltc;
 		initTextComps();
 	}
 	
 	private void initTextComps(){
 		textComponents = new HashMap<Integer, TextComponent>();
-		for(int i = 0; i < labeledTextComponents.height(); i++){
-			for(int j = 0; j < labeledTextComponents.width(); j++){
+		for(int i = 0; i < bianrizedBoardImage.height(); i++){
+			for(int j = 0; j < bianrizedBoardImage.width(); j++){
 				int[] data = new int[1];
-				labeledTextComponents.get(i, j, data);
+				bianrizedBoardImage.get(i, j, data);
 				if(data[0] != 0){
 					TextComponent txtComp = new TextComponent(data[0]);
 					textComponents.put(txtComp.getId(), txtComp);
@@ -33,7 +33,7 @@ public class BoardEditionModel {
 	// kliknieicie myszka
 	public void markTextComp(int x , int y, boolean isMarked){
 		int[] data = new int[1];
-		labeledTextComponents.get(y, x, data);
+		bianrizedBoardImage.get(y, x, data);
 		if(data[0] == 0) return;
 		textComponents.get(data[0]).setMarked(isMarked);		
 	}

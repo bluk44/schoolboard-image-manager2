@@ -8,9 +8,12 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -43,20 +46,23 @@ public class SourceImage {
 	private String name;
 	private Long date;
 
-	@Lob
-	@Basic(fetch = FetchType.EAGER)
-	private byte[] iconPixels;
-	@Lob
-	@Basic(fetch = FetchType.LAZY)
-	private byte[] imagePixels;
+	@AttributeOverrides({
+		@AttributeOverride(name="width", column=@Column(name="imageWidth")),
+		@AttributeOverride(name="height", column=@Column(name="imageHeight")),
+		@AttributeOverride(name="type", column=@Column(name="imageType")),
+		@AttributeOverride(name="pixels", column=@Column(name="imagePixels"))
+	})
+	@Embedded
+	private Image icon;
 	
-	private int imageWidth;
-	private int imageHeight;
-	
-	private int iconWidth;
-	private int iconHeight;
-	
-	private int openCVType;
+	@AttributeOverrides({
+		@AttributeOverride(name="width", column=@Column(name="iconWidth")),
+		@AttributeOverride(name="height", column=@Column(name="iconHeight")),
+		@AttributeOverride(name="type", column=@Column(name="iconType")),
+		@AttributeOverride(name="pixels", column=@Column(name="iconPixels"))
+	})
+	@Embedded
+	private Image image;
 	
 	@ManyToMany(mappedBy = "images")
 	Set<Category> categories = new HashSet<Category>();
@@ -67,19 +73,10 @@ public class SourceImage {
 	public SourceImage() {
 	};
 
-	public SourceImage(String name, Long date, byte[] iconPixels,
-			byte[] imagePixels, int imageWidth, int imageHeight, int iconWidth,
-			int iconHeight, int openCVType) {
-		super();
+	public SourceImage(Long id, String name, Long date) {
+		this.id = id;
 		this.name = name;
 		this.date = date;
-		this.iconPixels = iconPixels;
-		this.imagePixels = imagePixels;
-		this.imageWidth = imageWidth;
-		this.imageHeight = imageHeight;
-		this.iconWidth = iconWidth;
-		this.iconHeight = iconHeight;
-		this.openCVType = openCVType;
 	}
 	
 	public SourceImage(File file) {
@@ -87,24 +84,17 @@ public class SourceImage {
 		this.name = tab[tab.length - 1];
 		this.date = file.lastModified();
 		Mat image = Highgui.imread(file.getPath());
-		//Mat image = Util.readFromFileAsMat(file.getName());
 		Mat icon = new Mat();
-		
-		this.openCVType = image.type();
-		
-		this.imageHeight = (int) image.size().height;
-		this.imageWidth = (int) image.size().width;
 				
-		double imgSize = imageWidth * imageHeight;
+		int imageHeight = (int) image.size().height;
+		int imageWidth = (int) image.size().width;
+				
 		double scale = ICON_SIZE / (imageWidth * imageHeight);
 		
 		Imgproc.resize(image, icon, new Size(image.size().width * scale, image.size().height * scale));
-		
-		this.iconWidth = (int) icon.size().width;
-		this.iconHeight = (int) icon.size().height;
-		
-		this.imagePixels = Util.mat2Byte(image);
-		this.iconPixels = Util.mat2Byte(icon);
+				
+		this.image = new Image(image);
+		this.icon = new Image(icon);
 	
 	}
 
@@ -120,17 +110,20 @@ public class SourceImage {
 		return date;
 	}
 	
-	public Mat getImage(){
-		Mat image = new Mat(new Size(imageWidth, imageHeight), openCVType);
-		image.put(0, 0, getImagePixels());
+	public Image getIcon() {
+		return icon;
+	}
+
+	public void setIcon(Image icon) {
+		this.icon = icon;
+	}
+
+	public Image getImage() {
 		return image;
 	}
-	
-	
-	public Mat getIcon(){
-		Mat icon = new Mat(new Size(iconWidth, iconHeight), openCVType);
-		icon.put(0, 0, getIconPixels());
-		return icon;
+
+	public void setImage(Image image) {
+		this.image = image;
 	}
 	
 	public Set<Category> getCategories() {
@@ -155,17 +148,9 @@ public class SourceImage {
 				+ "]";
 	}
 
-	private byte[] getIconPixels() {
-		return iconPixels;
-	}
-
-	private byte[] getImagePixels() {
-		return imagePixels;
-	}
-	
-	public void createBoardRegion(Point[] quadrangle, BoardType boardType, BoardRegionParams params){
-		
-		Mat image = getImage();
+	public BoardRegion createBoardRegion(Point[] quadrangle, BoardType boardType, BoardRegionParams params){
+		System.out.println("create board region called");
+		Mat image = this.image.getMat();
 		
 		int x1 = (quadrangle[0].x + quadrangle[3].x) / 2;
 		int y1 = (quadrangle[0].y + quadrangle[1].y) / 2;
@@ -211,11 +196,11 @@ public class SourceImage {
 		}
 		
 		BoardRegion region = new BoardRegion(dstImage, quadrangle, boardType, params);
-		region.clearBackground();
 				
 		boardImages.add(region);
 		region.setSourceImage(this);
 		
+		return region;
 	}
 	
 }
