@@ -1,7 +1,5 @@
 package imagemanager.model;
 
-import imageprocessing.Util;
-
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,9 +21,6 @@ import javax.persistence.OneToMany;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-
-import test.Test;
 
 @Entity
 public class BoardRegion {

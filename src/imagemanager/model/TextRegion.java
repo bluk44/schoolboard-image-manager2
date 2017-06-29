@@ -1,15 +1,15 @@
 package imagemanager.model;
 
-import imageprocessing.AWTUtil;
-
-import java.awt.Polygon;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -18,10 +18,17 @@ public class TextRegion implements Serializable {
 	@Id
 	@GeneratedValue
 	private Long id;
-
-	@Lob
-	private Polygon perimeter;
-
+	
+	// lewy gorny rog prostokatneo obwodu regionu tekstoweo
+	private Point origin;
+	
+	// wymiary obwodu regionu tekstoweo
+	private Dimension dim;
+	
+	// Zbior elementow tekstu nalezacych do teoo regionu tekstowego 
+	// kazdy taki element ma swoj unikatowy numer
+	private Set<Long> blobs = new HashSet<Long>();
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private BoardRegion boardRegion;
 
@@ -36,14 +43,30 @@ public class TextRegion implements Serializable {
 		this.id = id;
 	}
 
-	public Polygon getPerimeter() {
-		return perimeter;
+	public Point getOrigin() {
+		return origin;
 	}
 
-	public void setPerimeter(Polygon perimeter) {
-		this.perimeter = perimeter;
+	public void setOrigin(Point origin) {
+		this.origin = origin;
 	}
 
+	public Dimension getDim() {
+		return dim;
+	}
+
+	public void setDim(Dimension dim) {
+		this.dim = dim;
+	}
+	
+	public Set<Long> getBlobs() {
+		return blobs;
+	}
+
+	public void setBlobs(Set<Long> blobs) {
+		this.blobs = blobs;
+	}
+	
 	public BoardRegion getBoardRegion() {
 		return boardRegion;
 	}
@@ -54,7 +77,8 @@ public class TextRegion implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TextRegion [id=" + id + ", perimeter="
-				+ AWTUtil.polygonToString(perimeter) + "]";
+		return "TextRegion [id=" + id + ", origin=" + origin + ", dim=" + dim
+				+ "]";
 	}
+
 }
