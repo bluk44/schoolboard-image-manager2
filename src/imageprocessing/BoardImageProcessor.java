@@ -1,8 +1,8 @@
 package imageprocessing;
 
-import imagemanager.gui.imagelookup.ImageViewComponent;
 import imagemanager.model.BoardRegion;
 import imagemanager.model.SourceImage;
+import imagemanager.view.ImageViewComponent;
 
 import java.awt.Point;
 import java.awt.Polygon;

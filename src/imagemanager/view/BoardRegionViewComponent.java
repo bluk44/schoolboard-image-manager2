@@ -1,15 +1,16 @@
 package imagemanager.view;
 
 import imagemanager.controller.BoardRegionController;
-import imagemanager.gui.imagelookup.ImageViewComponent;
 import imagemanager.model.BoardRegion;
 import imagemanager.model.TextRegion;
 import imageprocessing.FloodFill;
 import imageprocessing.Util;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -20,6 +21,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -44,8 +46,7 @@ public class BoardRegionViewComponent extends ImageViewComponent {
 		super.initialize();
 		setupListeners();
 		setupPopupMenu();
-			
-		
+
 	}
 	
 	public void setBoardRegion(BoardRegion region){
@@ -53,11 +54,11 @@ public class BoardRegionViewComponent extends ImageViewComponent {
 		System.out.println(region);
 		
 		setImage(Util.mat2Img(region.getClearedImage()));
-		Collection<TextRegion> tr = region.getTextRegions();
-		
-		for (TextRegion textRegion : tr) {
-			putShape("TR"+textRegion.getId(), textRegion.getPerimeter());
-		}
+//		Collection<TextRegion> tr = region.getTextRegions();
+//		
+//		for (TextRegion textRegion : tr) {
+//			putShape("TR"+textRegion.getId(), textRegion.getPerimeter());
+//		}
 		
 	}
 

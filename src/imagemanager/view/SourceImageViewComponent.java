@@ -3,7 +3,8 @@ package imagemanager.view;
 import imagemanager.controller.BoardRegionController;
 import imagemanager.controller.ImageController;
 import imagemanager.gui.imagelookup.DrawableBoardQuadrangle;
-import imagemanager.gui.imagelookup.ImageViewComponent;
+import imagemanager.gui.imagelookup.DrawableObject;
+import imagemanager.gui.imagelookup.DrawableShape;
 import imagemanager.gui.imagelookup.QuadrangleIncompleteException;
 import imagemanager.gui.imagelookup.QuadrangleSelecting;
 import imagemanager.model.SourceImage;
@@ -20,6 +21,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -54,6 +56,25 @@ public class SourceImageViewComponent extends ImageViewComponent {
 		super.initialize();
 		setupListeners();
 		setupPopupMenu();
+		
+		
+//		BufferedImage image = Util.readImageFromFile("images/wb01.png");
+		BufferedImage image = Util.readImageFromFile("images/biala-internet/wb01.png");
+		Polygon poly = new Polygon();
+//		poly.addPoint(100, 100);
+//		poly.addPoint(200, 80);
+//		poly.addPoint(320, 300);
+//		poly.addPoint(80, 320);
+		
+		poly.addPoint(10, 10);
+		poly.addPoint(15, 400);
+		poly.addPoint(500, 450);
+		poly.addPoint(550, 15);
+
+		
+		this.setImage(image);
+		this.putShape("p1", poly);
+		
 	}
 
 	public void resetView() {
@@ -101,11 +122,18 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	}
 
 	@Override
-	protected void drawObjects(Graphics2D g2d) {
-		drawImage(g2d);
+	protected void drawShapes(Graphics2D g2d) {
 		if (mode == DisplayMode.NORMAL) {
-			drawShapes(g2d);
+			Collection<DrawableObject> c = drawables.values();
+
+			for (DrawableObject obj : c) {
+				if (obj instanceof DrawableShape) {
+					//((DrawableShape) obj).transform(concAT);
+					obj.draw(g2d);
+				}
+			}
 		} else if (mode == DisplayMode.MANUAL_BOARD_SELECTION) {
+			System.out.println("drawing selection");
 			drawSelection(g2d);
 		}
 	}
@@ -160,7 +188,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	}
 
 	private void setupListeners() {
-
+		
 		MyKeyAdapter keyboard = new MyKeyAdapter();
 		this.addKeyListener(keyboard);
 		MyMouseAdapter mouse = new MyMouseAdapter();
@@ -195,7 +223,7 @@ public class SourceImageViewComponent extends ImageViewComponent {
 	class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			System.out.println("key presseds");
+			System.out.println("key pressed");
 			if (noImage)
 				return;
 

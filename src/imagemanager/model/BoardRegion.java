@@ -61,7 +61,7 @@ public class BoardRegion {
 	})
 	@Embedded
 	private Mask mask;
-
+		
 	@ManyToOne(fetch = FetchType.LAZY)
 	private SourceImage sourceImage;
 
@@ -88,7 +88,7 @@ public class BoardRegion {
 		this.boardType = boardType;
 		this.params = params;
 	}
-
+	
 	public Mat getClearedImage() {
 		Mat image = rawPicture.getMat();
 		Mat mask = this.mask.getMat();
@@ -103,7 +103,7 @@ public class BoardRegion {
 	public void updateMask(){
 		this.mask = new Mask(rawPicture.getMat(), boardType, params);		
 	}
-	
+		
 	public void extractTextRegions() {
 
 		// Mat image = getResultImage();

@@ -18,18 +18,19 @@ public class MainFrame extends JFrame {
 	public void initializeView() {
 
 		tabbedPane = new JTabbedPane();
-		tabbedPane.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (tabbedPane.getSelectedIndex() == 1) {
-					sourceImageView.requestFocus();
-				} else if(tabbedPane.getSelectedIndex() == 2){
-					boardRegionViewPane.requestFocus();
-				}
-			}
-		});
-		tabbedPane.addTab("Kolekcja zdjęć", imageCollectionView);
+		sourceImageView.requestFocus();
+//		tabbedPane.addChangeListener(new ChangeListener() {
+//			public void stateChanged(ChangeEvent e) {
+//				if (tabbedPane.getSelectedIndex() == 1) {
+//					sourceImageView.requestFocus();
+//				} else if(tabbedPane.getSelectedIndex() == 2){
+//					boardRegionViewPane.requestFocus();
+//				}
+//			}
+//		});
+		//tabbedPane.addTab("Kolekcja zdjęć", imageCollectionView);
 		tabbedPane.addTab("Podgląd zdjęcia", sourceImageView);
-		tabbedPane.addTab("Edycja regionu tablicy", boardRegionViewPane);
+		//tabbedPane.addTab("Edycja regionu tablicy", boardRegionViewPane);
 		setupTopMenu();
 		this.add(tabbedPane);
 		this.setJMenuBar(topMenu);

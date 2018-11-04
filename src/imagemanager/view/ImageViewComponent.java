@@ -1,4 +1,8 @@
-package imagemanager.gui.imagelookup;
+package imagemanager.view;
+
+import imagemanager.gui.imagelookup.DrawableImage;
+import imagemanager.gui.imagelookup.DrawableObject;
+import imagemanager.gui.imagelookup.DrawableShape;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,7 +27,7 @@ public class ImageViewComponent extends JComponent {
 	
 	protected AffineTransform translation = new AffineTransform();
 	protected AffineTransform scale = new AffineTransform();
-	protected AffineTransform concAT = new AffineTransform();
+	protected AffineTransform global = new AffineTransform();
 	
 	protected boolean noImage = true;
 	
@@ -134,30 +138,37 @@ public class ImageViewComponent extends JComponent {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		AffineTransform saveAT = g2d.getTransform();
-		concAT.setToIdentity();
-		concAT.concatenate(saveAT);
-		concAT.concatenate(translation);
-		concAT.concatenate(scale);
-		g2d.setTransform(concAT);
-		drawObjects(g2d);
-		g2d.setTransform(saveAT);
-
-	}
-
-	protected void drawObjects(Graphics2D g2d) {
+		global.setToIdentity();
+		global.concatenate(saveAT);
+		global.concatenate(translation);
+		global.concatenate(scale);
+		transformShapes(global);
+		g2d.setTransform(global);
 		drawImage(g2d);
+		g2d.setTransform(saveAT);
 		drawShapes(g2d);
 	}
-
+	
 	protected void drawImage(Graphics2D g2d) {
 		drawables.get("image").draw(g2d);
 	}
 
+	protected void transformShapes(AffineTransform at){
+		Collection<DrawableObject> c = drawables.values();
+
+		for (DrawableObject obj : c) {
+			if (obj instanceof DrawableShape) {
+				((DrawableShape) obj).transform(global);
+			}
+		}
+	}
+	
 	protected void drawShapes(Graphics2D g2d) {
 		Collection<DrawableObject> c = drawables.values();
 
 		for (DrawableObject obj : c) {
 			if (obj instanceof DrawableShape) {
+				//((DrawableShape) obj).transform(concAT);
 				obj.draw(g2d);
 			}
 		}
