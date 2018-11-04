@@ -33,11 +33,18 @@ public class TextLocating {
 	}
 
 	private static int squareSize = 47;
-
+	/**
+	 * Szuka regionow z tekstem
+	 * 
+	 * Dzieli zdjecie na wieksze kwadraty. Jesli w kwadracie są biale piksele caly kwadrat jest bialy,
+	 * grupuje kwadrary w osobne plamy, znajduje obwod kazdej plamy
+	 * 
+	 * @param image
+	 * @return
+	 */
 	public static List<Polygon> findTextPolygons(BufferedImage image) {
 		
-		System.out.println(image == null);
-		
+		// zmniejszenie zdjecia
 		int nh = (int) Math.round(image.getHeight() / (double) squareSize);
 		int nw = (int) Math.round(image.getWidth() / (double) squareSize);
 
@@ -45,7 +52,8 @@ public class TextLocating {
 		double yScale = (double) (nh * squareSize) / image.getHeight();
 
 		BufferedImage corrected = Util.resize(image, xScale, yScale);
-		Test.showImage(corrected, corrected.getWidth()+" "+corrected.getHeight());
+		//
+		
 //		BufferedImage textRegionsMap = new BufferedImage(nw, nh,
 //				BufferedImage.TYPE_BYTE_GRAY);
 //		Color c = new Color(255, 255, 255);
@@ -62,13 +70,12 @@ public class TextLocating {
 //			++mapy;
 //		}
 
+		// tworzenie mapy regionow tekstu
 		BufferedImage textRegionsMap = createTextRegionsMap(corrected);
-		Test.showImage(corrected, "corrected");
-		Test.showImage(textRegionsMap, "textRegionsMap");
 		fillIsolatedBackground(textRegionsMap);
+		//
 		
-		
-		List<Region> regions = Labeling4.run(textRegionsMap);
+		List<Region> regions = Labeling4.run(Util.image2Mat(textRegionsMap));
 		List<Polygon> polys = new ArrayList<Polygon>(regions.size());
 
 		for (Region region : regions) {
@@ -84,7 +91,7 @@ public class TextLocating {
 
 		return polys;
 		
-		return null;
+		//return null;
 	}
 
 	private static BufferedImage createTextRegionsMap(BufferedImage image){

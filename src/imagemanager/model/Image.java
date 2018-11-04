@@ -65,7 +65,12 @@ public class Image {
 
 		return mat;
 	}
+	
+	public Mat applyMask(Mask mask){
+		Mat mat = getMat();
 		
+	}
+	
 	public void update(Mat mat){
 		this.width = mat.width();
 		this.height = mat.height();

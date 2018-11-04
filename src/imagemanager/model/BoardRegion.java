@@ -1,8 +1,14 @@
 package imagemanager.model;
 
+import imageprocessing.TextLocating;
+import imageprocessing.Util;
+
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -106,15 +112,17 @@ public class BoardRegion {
 		
 	public void extractTextRegions() {
 
-		// Mat image = getResultImage();
-		// List<Polygon> textPolygons =
-		// TextLocating.findTextPolygons(Util.mat2Img(image));
-		// for (Polygon polygon : textPolygons) {
-		// TextRegion textRegion = new TextRegion();
-		// textRegion.setPerimeter(polygon);
-		// textRegion.setBoardRegion(this);
-		// textRegions.add(textRegion);
-		// }
+		Mat mask = this.mask.getMat();
+
+		 List<Polygon> textPolygons =
+		 TextLocating.findTextPolygons(Util.mat2Img(mask));
+		 for (Polygon polygon : textPolygons) {
+		 TextRegion textRegion = new TextRegion();
+		 textRegion.setDim(new Dimension((int)polygon.getBounds().getWidth(), (int)polygon.getBounds().getHeight()));
+		 textRegion.setOrigin(new Point(polygon.getBounds().x, polygon.getBounds().y));
+		 //textRegion.setBoardRegion(this);
+		 textRegions.add(textRegion);
+		 }
 	}
 
 	public Long getId() {
