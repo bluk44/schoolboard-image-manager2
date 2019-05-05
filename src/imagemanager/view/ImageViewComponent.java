@@ -142,11 +142,12 @@ public class ImageViewComponent extends JComponent {
 		global.concatenate(saveAT);
 		global.concatenate(translation);
 		global.concatenate(scale);
-		transformShapes(global);
 		g2d.setTransform(global);
 		drawImage(g2d);
-		g2d.setTransform(saveAT);
 		drawShapes(g2d);
+		g2d.setTransform(saveAT);
+
+		
 	}
 	
 	protected void drawImage(Graphics2D g2d) {
@@ -213,7 +214,6 @@ public class ImageViewComponent extends JComponent {
 		public void keyPressed(KeyEvent e) {
 			
 			if(keyboardEnabled == false ) return;
-			System.out.println("key pressed");
 			super.keyPressed(e);
 			if(noImage) return;
 			if(e.getKeyCode() == e.VK_LEFT){

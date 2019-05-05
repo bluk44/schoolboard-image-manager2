@@ -232,9 +232,9 @@ public abstract class Util {
 			type = BufferedImage.TYPE_BYTE_GRAY;
 		else
 			type = BufferedImage.TYPE_3BYTE_BGR;
-
+		
 		BufferedImage out = new BufferedImage(in.width(), in.height(), type);
-
+		
 		byte[] data = ((DataBufferByte) out.getRaster().getDataBuffer())
 				.getData();
 		in.get(0, 0, data);
